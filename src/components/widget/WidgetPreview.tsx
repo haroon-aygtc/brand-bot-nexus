@@ -1,5 +1,6 @@
 
-import { MessageSquareMore, X } from 'lucide-react';
+import { MessageSquareMore, X, Maximize, Minimize } from 'lucide-react';
+import { useState } from 'react';
 
 interface WidgetPreviewProps {
   config: any;
@@ -7,6 +8,8 @@ interface WidgetPreviewProps {
 }
 
 const WidgetPreview = ({ config, showWelcomeButtons = false }: WidgetPreviewProps) => {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  
   const {
     appearance: {
       primaryColor,
@@ -40,26 +43,45 @@ const WidgetPreview = ({ config, showWelcomeButtons = false }: WidgetPreviewProp
     }
   };
 
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+  };
+
+  const containerStyles = isFullscreen ? {
+    position: 'fixed' as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100vw',
+    height: '100vh',
+    maxWidth: '100vw',
+    maxHeight: '100vh',
+    zIndex: 50,
+    margin: 0,
+    borderRadius: 0,
+  } : {
+    width: `${widgetWidth}px`, 
+    height: `${widgetHeight}px`,
+    borderRadius: `${borderRadius}px`,
+    maxWidth: '100%',
+    maxHeight: '650px'
+  };
+
   return (
     <div 
       className={`flex flex-col overflow-hidden ${getShadowClass()} transition-all ${
         darkMode ? 'bg-gray-800' : 'bg-white'
-      } ${glassMorphism ? 'backdrop-blur-md bg-opacity-80' : ''}`}
-      style={{ 
-        width: `${widgetWidth}px`, 
-        height: `${widgetHeight}px`,
-        borderRadius: `${borderRadius}px`,
-        maxWidth: '100%',
-        maxHeight: '650px'
-      }}
+      } ${glassMorphism ? 'backdrop-blur-md bg-opacity-80' : ''} relative`}
+      style={containerStyles}
     >
       {/* Widget Header */}
       <div 
         className="p-4 flex items-center justify-between"
         style={{ 
           backgroundColor: headerBgColor,
-          borderTopLeftRadius: `${borderRadius}px`,
-          borderTopRightRadius: `${borderRadius}px`,
+          borderTopLeftRadius: isFullscreen ? 0 : `${borderRadius}px`,
+          borderTopRightRadius: isFullscreen ? 0 : `${borderRadius}px`,
           ...(glassMorphism && { backdropFilter: 'blur(10px)', backgroundColor: `${headerBgColor}cc` })
         }}
       >
@@ -72,9 +94,21 @@ const WidgetPreview = ({ config, showWelcomeButtons = false }: WidgetPreviewProp
           </div>
           <h3 className="font-semibold text-white">{botName}</h3>
         </div>
-        <button className="text-white hover:bg-white/10 rounded-full p-1">
-          <X className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button 
+            className="text-white hover:bg-white/10 rounded-full p-1"
+            onClick={toggleFullscreen}
+          >
+            {isFullscreen ? (
+              <Minimize className="w-5 h-5" />
+            ) : (
+              <Maximize className="w-5 h-5" />
+            )}
+          </button>
+          <button className="text-white hover:bg-white/10 rounded-full p-1">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
       </div>
       
       {/* Chat Area */}
@@ -156,8 +190,8 @@ const WidgetPreview = ({ config, showWelcomeButtons = false }: WidgetPreviewProp
       <div 
         className={`p-3 border-t ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
         style={{ 
-          borderBottomLeftRadius: `${borderRadius}px`,
-          borderBottomRightRadius: `${borderRadius}px`
+          borderBottomLeftRadius: isFullscreen ? 0 : `${borderRadius}px`,
+          borderBottomRightRadius: isFullscreen ? 0 : `${borderRadius}px`
         }}
       >
         <div className="flex items-center">
@@ -186,21 +220,23 @@ const WidgetPreview = ({ config, showWelcomeButtons = false }: WidgetPreviewProp
       </div>
       
       {/* Minimized Bubble Preview */}
-      <div 
-        className="absolute -bottom-16 right-0"
-        style={{ 
-          width: '60px',
-          height: '60px',
-          borderRadius: '30px',
-          backgroundColor: primaryColor,
-          boxShadow: shadow !== 'none' ? '0 4px 20px rgba(0, 0, 0, 0.15)' : 'none',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
-        <MessageSquareMore className="w-6 h-6 text-white" />
-      </div>
+      {!isFullscreen && (
+        <div 
+          className="absolute -bottom-16 right-0"
+          style={{ 
+            width: '60px',
+            height: '60px',
+            borderRadius: '30px',
+            backgroundColor: primaryColor,
+            boxShadow: shadow !== 'none' ? '0 4px 20px rgba(0, 0, 0, 0.15)' : 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <MessageSquareMore className="w-6 h-6 text-white" />
+        </div>
+      )}
     </div>
   );
 };

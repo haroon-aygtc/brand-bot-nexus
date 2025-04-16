@@ -1,5 +1,6 @@
 
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
+import { Maximize, Minimize } from 'lucide-react';
 
 interface DevicePreviewProps {
   device: 'desktop' | 'tablet' | 'mobile';
@@ -7,7 +8,17 @@ interface DevicePreviewProps {
 }
 
 const DevicePreview = ({ device, children }: DevicePreviewProps) => {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   const getDeviceStyles = () => {
+    if (isFullscreen) {
+      return {
+        wrapper: 'w-full h-full fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80',
+        scale: 1,
+        background: 'bg-transparent',
+      };
+    }
+
     switch (device) {
       case 'desktop':
         return {
@@ -38,8 +49,12 @@ const DevicePreview = ({ device, children }: DevicePreviewProps) => {
 
   const { wrapper, scale, background } = getDeviceStyles();
 
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+  };
+
   return (
-    <div className={`${wrapper} ${background} transition-all duration-300`}>
+    <div className={`${wrapper} ${background} transition-all duration-300 relative`}>
       <div 
         className="device-content"
         style={{ 
@@ -50,6 +65,17 @@ const DevicePreview = ({ device, children }: DevicePreviewProps) => {
       >
         {children}
       </div>
+      
+      <button 
+        onClick={toggleFullscreen}
+        className="absolute top-2 right-2 p-2 bg-gray-800/50 hover:bg-gray-800/80 rounded-full text-white transition-colors z-10"
+      >
+        {isFullscreen ? (
+          <Minimize className="h-4 w-4" />
+        ) : (
+          <Maximize className="h-4 w-4" />
+        )}
+      </button>
     </div>
   );
 };
