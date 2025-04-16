@@ -8,13 +8,13 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
 import { 
   Copy, Code, Settings, Info, Palette, MessageSquare, LayoutTemplate, 
   Smartphone, Save, Download, Sparkles, Layers, Brush, Zap, 
   Monitor, Tablet, Smartphone as PhoneIcon, MousePointer, 
-  Shuffle, Heart, FlaskConical, X
+  Shuffle, Heart, FlaskConical, X, Plus
 } from 'lucide-react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -437,8 +437,7 @@ const WidgetConfigPage = () => {
                               <Input {...field} placeholder="Enter welcome message" />
                             </FormControl>
                             <FormDescription>
-                              First message users will see when opening the chat.
-                            </FormDescription>
+                              First message users will see when opening the chat.</FormDescription>
                           </FormItem>
                         )}
                       />
@@ -906,3 +905,4 @@ const WidgetConfigPage = () => {
                         />
                         
                         {form.watch("behavior.autoOpen") && (
+                          <FormField
