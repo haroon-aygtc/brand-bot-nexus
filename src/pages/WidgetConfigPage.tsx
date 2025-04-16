@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -906,3 +907,132 @@ const WidgetConfigPage = () => {
                         
                         {form.watch("behavior.autoOpen") && (
                           <FormField
+                            control={form.control}
+                            name="behavior.autoOpenDelay"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Auto Open Delay: {field.value} seconds</FormLabel>
+                                <FormControl>
+                                  <Slider
+                                    min={0}
+                                    max={60}
+                                    step={1}
+                                    defaultValue={[field.value]}
+                                    onValueChange={(vals) => field.onChange(vals[0])}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  Time to wait before opening the widget automatically.
+                                </FormDescription>
+                              </FormItem>
+                            )}
+                          />
+                        )}
+                        
+                        {/* Add remaining behavior tab fields here */}
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="content" className="space-y-4 pt-4">
+                      {/* Content tab content */}
+                      <p className="text-muted-foreground">Configure content settings for your widget.</p>
+                      {/* Add content tab fields here */}
+                    </TabsContent>
+                    
+                    <TabsContent value="advanced" className="space-y-4 pt-4">
+                      {/* Advanced tab content */}
+                      <p className="text-muted-foreground">Configure advanced settings for your widget.</p>
+                      {/* Add advanced tab fields here */}
+                    </TabsContent>
+                  </Tabs>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="lg:w-2/5">
+          <Card className="border-none shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center justify-between">
+                <div className="flex items-center">
+                  <LayoutTemplate className="mr-2 h-5 w-5" />
+                  Preview
+                </div>
+                <div className="flex items-center gap-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 w-8 p-0"
+                          onClick={() => setPreviewDevice("desktop")}
+                        >
+                          <Monitor className={`h-5 w-5 ${previewDevice === "desktop" ? "text-primary" : "text-muted-foreground"}`} />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Desktop preview
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          onClick={() => setPreviewDevice("tablet")}
+                        >
+                          <Tablet className={`h-5 w-5 ${previewDevice === "tablet" ? "text-primary" : "text-muted-foreground"}`} />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Tablet preview
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          onClick={() => setPreviewDevice("mobile")}
+                        >
+                          <PhoneIcon className={`h-5 w-5 ${previewDevice === "mobile" ? "text-primary" : "text-muted-foreground"}`} />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Mobile preview
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {previewVisible && (
+                <DevicePreview device={previewDevice}>
+                  <WidgetPreview formValues={form.getValues()} />
+                </DevicePreview>
+              )}
+              
+              <div className="mt-6 pt-6 border-t">
+                <h3 className="text-sm font-medium mb-2">Embed Code</h3>
+                <EmbedCodeGenerator formValues={form.getValues()} />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default WidgetConfigPage;
