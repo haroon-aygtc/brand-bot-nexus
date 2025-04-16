@@ -15,6 +15,7 @@ import {
   LogOut,
   ChevronLeft,
   Menu,
+  Sliders,
 } from 'lucide-react';
 
 type NavItem = {
@@ -26,7 +27,7 @@ type NavItem = {
 
 const mainNavItems: NavItem[] = [
   { title: 'Dashboard', icon: LayoutDashboard, path: '/' },
-  { title: 'Widget Config', icon: Settings, path: '/widget-config' },
+  { title: 'Widget Config', icon: Sliders, path: '/widget-config' },
   { title: 'Context Rules', icon: MessageSquare, path: '/context-rules' },
   { title: 'Templates', icon: FileText, path: '/templates' },
   { title: 'Embed Code', icon: Code, path: '/embed-code' },

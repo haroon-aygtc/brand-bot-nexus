@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import Dashboard from "@/pages/Dashboard";
 import ChatPage from "@/pages/ChatPage";
+import WidgetConfigPage from "@/pages/WidgetConfigPage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,11 @@ const App = () => (
           <Route path="/chats" element={
             <AppLayout>
               <ChatPage />
+            </AppLayout>
+          } />
+          <Route path="/widget-config" element={
+            <AppLayout>
+              <WidgetConfigPage />
             </AppLayout>
           } />
           <Route path="/knowledge" element={
