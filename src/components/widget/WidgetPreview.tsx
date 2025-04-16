@@ -3,9 +3,10 @@ import { MessageSquareMore, X } from 'lucide-react';
 
 interface WidgetPreviewProps {
   config: any;
+  showWelcomeButtons?: boolean;
 }
 
-const WidgetPreview = ({ config }: WidgetPreviewProps) => {
+const WidgetPreview = ({ config, showWelcomeButtons = false }: WidgetPreviewProps) => {
   const {
     appearance: {
       primaryColor,
@@ -14,18 +15,36 @@ const WidgetPreview = ({ config }: WidgetPreviewProps) => {
       borderRadius,
       widgetWidth,
       widgetHeight,
-      darkMode
+      darkMode,
+      glassMorphism,
+      shadow,
+      animation
     },
     general: {
       botName,
       welcomeMessage,
       placeholderText
+    },
+    behavior: {
+      welcomeButtons
     }
   } = config;
 
+  const getShadowClass = () => {
+    switch(shadow) {
+      case 'sm': return 'shadow-sm';
+      case 'md': return 'shadow-md';
+      case 'lg': return 'shadow-lg';
+      case 'xl': return 'shadow-xl';
+      default: return '';
+    }
+  };
+
   return (
     <div 
-      className={`flex flex-col shadow-lg overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'}`}
+      className={`flex flex-col overflow-hidden ${getShadowClass()} transition-all ${
+        darkMode ? 'bg-gray-800' : 'bg-white'
+      } ${glassMorphism ? 'backdrop-blur-md bg-opacity-80' : ''}`}
       style={{ 
         width: `${widgetWidth}px`, 
         height: `${widgetHeight}px`,
@@ -40,7 +59,8 @@ const WidgetPreview = ({ config }: WidgetPreviewProps) => {
         style={{ 
           backgroundColor: headerBgColor,
           borderTopLeftRadius: `${borderRadius}px`,
-          borderTopRightRadius: `${borderRadius}px`
+          borderTopRightRadius: `${borderRadius}px`,
+          ...(glassMorphism && { backdropFilter: 'blur(10px)', backgroundColor: `${headerBgColor}cc` })
         }}
       >
         <div className="flex items-center">
@@ -77,6 +97,24 @@ const WidgetPreview = ({ config }: WidgetPreviewProps) => {
             <p className={`text-sm ${darkMode ? 'text-white' : 'text-gray-800'}`}>
               {welcomeMessage}
             </p>
+
+            {/* Quick reply buttons */}
+            {showWelcomeButtons && welcomeButtons && welcomeButtons.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {welcomeButtons.map((button: {label: string, value: string}, idx: number) => (
+                  <button 
+                    key={idx}
+                    className="px-3 py-1 text-xs rounded-full transition-colors"
+                    style={{ 
+                      backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                      color: darkMode ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.8)'
+                    }}
+                  >
+                    {button.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         
@@ -155,7 +193,7 @@ const WidgetPreview = ({ config }: WidgetPreviewProps) => {
           height: '60px',
           borderRadius: '30px',
           backgroundColor: primaryColor,
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+          boxShadow: shadow !== 'none' ? '0 4px 20px rgba(0, 0, 0, 0.15)' : 'none',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center'
