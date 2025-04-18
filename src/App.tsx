@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +10,7 @@ import ChatPage from "@/pages/ChatPage";
 import WidgetConfigPage from "@/pages/WidgetConfigPage";
 import NotFound from "@/pages/NotFound";
 import AiModelsPage from "@/pages/AiModelsPage";
+import AiModelConfigPage from "@/pages/AiModelConfigPage";
 
 const queryClient = new QueryClient();
 
@@ -86,6 +88,11 @@ const App = () => (
           <Route path="/ai-models" element={
             <AppLayout>
               <AiModelsPage />
+            </AppLayout>
+          } />
+          <Route path="/ai-model-config" element={
+            <AppLayout>
+              <AiModelConfigPage />
             </AppLayout>
           } />
           <Route path="*" element={<NotFound />} />

@@ -1,11 +1,13 @@
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Cpu, Sparkles } from "lucide-react";
+import { Cpu, Settings, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface ModelCardProps {
   name: string;
@@ -23,6 +25,11 @@ export const ModelCard = ({
   defaultEnabled = false,
 }: ModelCardProps) => {
   const Icon = icon === "sparkles" ? Sparkles : Cpu;
+  const navigate = useNavigate();
+
+  const handleConfigureClick = () => {
+    navigate("/ai-model-config");
+  };
 
   return (
     <Card>
@@ -52,6 +59,14 @@ export const ModelCard = ({
           <Label>Max Tokens</Label>
           <Input type="number" defaultValue={2000} />
         </div>
+        <Button 
+          variant="outline" 
+          className="w-full mt-2"
+          onClick={handleConfigureClick}
+        >
+          <Settings className="mr-2 h-4 w-4" />
+          Advanced Configuration
+        </Button>
       </CardContent>
     </Card>
   );
