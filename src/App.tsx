@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +8,7 @@ import Dashboard from "@/pages/Dashboard";
 import ChatPage from "@/pages/ChatPage";
 import WidgetConfigPage from "@/pages/WidgetConfigPage";
 import NotFound from "@/pages/NotFound";
+import AiModelsPage from "@/pages/AiModelsPage";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +81,11 @@ const App = () => (
               <div className="flex items-center justify-center h-full bg-muted/30 rounded-lg border border-border">
                 <p className="text-muted-foreground">Settings - Coming Soon</p>
               </div>
+            </AppLayout>
+          } />
+          <Route path="/ai-models" element={
+            <AppLayout>
+              <AiModelsPage />
             </AppLayout>
           } />
           <Route path="*" element={<NotFound />} />
