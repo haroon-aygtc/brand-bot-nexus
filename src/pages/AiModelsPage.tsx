@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,25 +8,26 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AddModelForm } from '@/components/ai-models/AddModelForm';
 import { 
   Brain, 
   Cpu, 
   Settings, 
   Zap, 
-  MessageSquare, 
   Save,
   Sparkles,
   Gauge,
-  Network
+  Network,
+  Plus
 } from 'lucide-react';
 
 const AiModelsPage = () => {
   const [activeTab, setActiveTab] = useState('models');
   const [saving, setSaving] = useState(false);
+  const [showAddModel, setShowAddModel] = useState(false);
 
   const handleSave = () => {
     setSaving(true);
-    // Simulate API call
     setTimeout(() => setSaving(false), 1000);
   };
 
@@ -41,20 +41,40 @@ const AiModelsPage = () => {
           </div>
           <p className="text-muted-foreground">Configure and manage AI models for your chatbot.</p>
         </div>
-        <Button onClick={handleSave} disabled={saving}>
-          {saving ? (
-            <span className="flex items-center">
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-              Saving...
-            </span>
-          ) : (
-            <>
-              <Save className="mr-2 h-4 w-4" />
-              Save Changes
-            </>
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setShowAddModel(!showAddModel)}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Model
+          </Button>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? (
+              <span className="flex items-center">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                Saving...
+              </span>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Save Changes
+              </>
+            )}
+          </Button>
+        </div>
       </div>
+
+      {showAddModel && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Add New AI Model</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AddModelForm />
+          </CardContent>
+        </Card>
+      )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3">
@@ -191,6 +211,14 @@ const AiModelsPage = () => {
               <CardTitle>Global Settings</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="flex justify-between items-center">
+                <div className="space-y-1">
+                  <Label>API Endpoint Override</Label>
+                  <p className="text-sm text-muted-foreground">Override the default API endpoint for all models</p>
+                </div>
+                <Input className="w-[300px]" placeholder="https://api.example.com/v1" />
+              </div>
+
               <div className="flex justify-between items-center">
                 <div className="space-y-1">
                   <Label>Fallback Model</Label>
