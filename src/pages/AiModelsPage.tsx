@@ -1,25 +1,15 @@
+
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Brain, Network, Settings, Save, Plus } from 'lucide-react';
 import { AddModelForm } from '@/components/ai-models/AddModelForm';
-import { 
-  Brain, 
-  Cpu, 
-  Settings, 
-  Zap, 
-  Save,
-  Sparkles,
-  Gauge,
-  Network,
-  Plus
-} from 'lucide-react';
+import { ModelCard } from '@/components/ai-models/ModelCard';
+import { PerformanceMetrics } from '@/components/ai-models/PerformanceMetrics';
+import { ModelRouting } from '@/components/ai-models/ModelRouting';
+import { GlobalSettings } from '@/components/ai-models/GlobalSettings';
 
 const AiModelsPage = () => {
   const [activeTab, setActiveTab] = useState('models');
@@ -94,164 +84,29 @@ const AiModelsPage = () => {
 
         <TabsContent value="models" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* GPT-4 Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-purple-500" />
-                    GPT-4 Turbo
-                  </div>
-                  <Badge className="bg-purple-500">Primary</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <Label>Enable Model</Label>
-                  <Switch defaultChecked />
-                </div>
-                <div className="space-y-2">
-                  <Label>Temperature</Label>
-                  <Slider defaultValue={[0.7]} max={1} step={0.1} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Max Tokens</Label>
-                  <Input type="number" defaultValue={2000} />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Claude Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Cpu className="h-5 w-5 text-blue-500" />
-                    Claude 3
-                  </div>
-                  <Badge variant="outline">Secondary</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <Label>Enable Model</Label>
-                  <Switch />
-                </div>
-                <div className="space-y-2">
-                  <Label>Temperature</Label>
-                  <Slider defaultValue={[0.5]} max={1} step={0.1} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Max Tokens</Label>
-                  <Input type="number" defaultValue={1500} />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Performance Metrics Card */}
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Gauge className="h-5 w-5" />
-                  Performance Metrics
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-lg bg-muted">
-                    <p className="text-sm text-muted-foreground">Avg. Response Time</p>
-                    <p className="text-2xl font-bold">1.2s</p>
-                  </div>
-                  <div className="p-4 rounded-lg bg-muted">
-                    <p className="text-sm text-muted-foreground">Success Rate</p>
-                    <p className="text-2xl font-bold">99.8%</p>
-                  </div>
-                  <div className="p-4 rounded-lg bg-muted">
-                    <p className="text-sm text-muted-foreground">Daily Requests</p>
-                    <p className="text-2xl font-bold">2.4k</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <ModelCard
+              name="GPT-4 Turbo"
+              icon="sparkles"
+              color="purple"
+              isPrimary
+              defaultEnabled
+            />
+            <ModelCard
+              name="Claude 3"
+              icon="cpu"
+              color="blue"
+              defaultEnabled={false}
+            />
+            <PerformanceMetrics />
           </div>
         </TabsContent>
 
         <TabsContent value="routing" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Model Routing Rules</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <Select defaultValue="gpt4">
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Select Model" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="gpt4">GPT-4 Turbo</SelectItem>
-                      <SelectItem value="claude">Claude 3</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Input placeholder="Enter condition (e.g., contains:'technical')" className="flex-1" />
-                  <Button variant="outline">Add Rule</Button>
-                </div>
-                
-                <div className="rounded-lg border p-4">
-                  <p className="text-sm text-muted-foreground">No routing rules configured yet.</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <ModelRouting />
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Global Settings</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <div className="space-y-1">
-                  <Label>API Endpoint Override</Label>
-                  <p className="text-sm text-muted-foreground">Override the default API endpoint for all models</p>
-                </div>
-                <Input className="w-[300px]" placeholder="https://api.example.com/v1" />
-              </div>
-
-              <div className="flex justify-between items-center">
-                <div className="space-y-1">
-                  <Label>Fallback Model</Label>
-                  <p className="text-sm text-muted-foreground">Model to use when primary is unavailable</p>
-                </div>
-                <Select defaultValue="gpt4">
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select Model" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="gpt4">GPT-4 Turbo</SelectItem>
-                    <SelectItem value="claude">Claude 3</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <div className="space-y-1">
-                  <Label>Automatic Failover</Label>
-                  <p className="text-sm text-muted-foreground">Switch to fallback model automatically</p>
-                </div>
-                <Switch defaultChecked />
-              </div>
-
-              <div className="flex justify-between items-center">
-                <div className="space-y-1">
-                  <Label>Response Caching</Label>
-                  <p className="text-sm text-muted-foreground">Cache common responses for faster replies</p>
-                </div>
-                <Switch />
-              </div>
-            </CardContent>
-          </Card>
+          <GlobalSettings />
         </TabsContent>
       </Tabs>
     </div>
