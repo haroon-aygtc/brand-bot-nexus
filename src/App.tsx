@@ -11,6 +11,8 @@ import WidgetConfigPage from "@/pages/WidgetConfigPage";
 import NotFound from "@/pages/NotFound";
 import AiModelsPage from "@/pages/AiModelsPage";
 import AiModelConfigPage from "@/pages/AiModelConfigPage";
+import KnowledgeBasePage from "@/pages/KnowledgeBasePage";
+import ScraperPage from "@/pages/ScraperPage";
 
 const queryClient = new QueryClient();
 
@@ -38,16 +40,12 @@ const App = () => (
           } />
           <Route path="/knowledge" element={
             <AppLayout>
-              <div className="flex items-center justify-center h-full bg-muted/30 rounded-lg border border-border">
-                <p className="text-muted-foreground">Knowledge Base - Coming Soon</p>
-              </div>
+              <KnowledgeBasePage />
             </AppLayout>
           } />
           <Route path="/scraper" element={
             <AppLayout>
-              <div className="flex items-center justify-center h-full bg-muted/30 rounded-lg border border-border">
-                <p className="text-muted-foreground">Web Scraper - Coming Soon</p>
-              </div>
+              <ScraperPage />
             </AppLayout>
           } />
           <Route path="/customers" element={
