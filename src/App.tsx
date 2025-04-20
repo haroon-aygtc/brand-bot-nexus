@@ -13,6 +13,7 @@ import AiModelConfigPage from "@/pages/AiModelConfigPage";
 import KnowledgeBasePage from "@/pages/KnowledgeBasePage";
 import ScraperPage from "@/pages/ScraperPage";
 import EmbedCodePage from "@/pages/EmbedCodePage";
+import ContextRulesPage from "@/pages/ContextRulesPage";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,11 @@ const App = () => (
           <Route path="/widget-config" element={
             <AppLayout>
               <WidgetConfigPage />
+            </AppLayout>
+          } />
+          <Route path="/context-rules" element={
+            <AppLayout>
+              <ContextRulesPage />
             </AppLayout>
           } />
           <Route path="/knowledge" element={
