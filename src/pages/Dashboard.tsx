@@ -1,7 +1,7 @@
-
 import { BarChart3, Code, MessageSquare, Settings, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Link, useNavigate } from 'react-router-dom';
 
 const StatCard = ({ title, value, trend, trendValue, icon: Icon }: {
   title: string;
@@ -73,6 +73,8 @@ const StatusItem = ({ label, value, status }: {
 };
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -89,31 +91,67 @@ const Dashboard = () => {
       {/* Top-level tabs */}
       <div className="flex overflow-x-auto py-2 -mx-6 px-6 scrollbar-none">
         <div className="flex space-x-1 border-b border-border w-full min-w-max">
-          <Button variant="ghost" className="rounded-none border-b-2 border-primary text-primary">
+          <Button 
+            variant="ghost" 
+            className="rounded-none border-b-2 border-primary text-primary"
+            onClick={() => navigate('/')}
+          >
             Overview
           </Button>
-          <Button variant="ghost" className="rounded-none border-b-2 border-transparent hover:border-primary/40">
+          <Button 
+            variant="ghost" 
+            className="rounded-none border-b-2 border-transparent hover:border-primary/40"
+            onClick={() => navigate('/widget-config')}
+          >
             Widget Config
           </Button>
-          <Button variant="ghost" className="rounded-none border-b-2 border-transparent hover:border-primary/40">
+          <Button 
+            variant="ghost" 
+            className="rounded-none border-b-2 border-transparent hover:border-primary/40"
+            onClick={() => navigate('/context-rules')}
+          >
             Context Rules
           </Button>
-          <Button variant="ghost" className="rounded-none border-b-2 border-transparent hover:border-primary/40">
+          <Button 
+            variant="ghost" 
+            className="rounded-none border-b-2 border-transparent hover:border-primary/40"
+            onClick={() => navigate('/prompts')}
+          >
             Templates
           </Button>
-          <Button variant="ghost" className="rounded-none border-b-2 border-transparent hover:border-primary/40">
+          <Button 
+            variant="ghost" 
+            className="rounded-none border-b-2 border-transparent hover:border-primary/40"
+            onClick={() => navigate('/embed-code')}
+          >
             Embed Code
           </Button>
-          <Button variant="ghost" className="rounded-none border-b-2 border-transparent hover:border-primary/40">
+          <Button 
+            variant="ghost" 
+            className="rounded-none border-b-2 border-transparent hover:border-primary/40"
+            onClick={() => navigate('/analytics')}
+          >
             Analytics
           </Button>
-          <Button variant="ghost" className="rounded-none border-b-2 border-transparent hover:border-primary/40">
+          <Button 
+            variant="ghost" 
+            className="rounded-none border-b-2 border-transparent hover:border-primary/40"
+            onClick={() => navigate('/prompts')}
+          >
             Response Formatter
           </Button>
-          <Button variant="ghost" className="rounded-none border-b-2 border-transparent hover:border-primary/40">
+          <Button 
+            variant="ghost" 
+            className="rounded-none border-b-2 border-transparent hover:border-primary/40"
+            onClick={() => navigate('/ai-models')}
+          >
             AI Models
           </Button>
-          <Button variant="ghost" className="rounded-none border-b-2 border-transparent hover:border-primary/40">
+          <Button 
+            variant="ghost" 
+            className="rounded-none border-b-2 border-transparent hover:border-primary/40"
+            onClick={() => navigate('/scraper')}
+          >
             Web Scraping
           </Button>
         </div>
@@ -164,17 +202,17 @@ const Dashboard = () => {
                 <QuickActionCard 
                   title="Configure Widget" 
                   icon={Settings} 
-                  onClick={() => console.log('Configure Widget')} 
+                  onClick={() => navigate('/widget-config')} 
                 />
                 <QuickActionCard 
                   title="Edit Context Rules" 
                   icon={MessageSquare} 
-                  onClick={() => console.log('Edit Context Rules')} 
+                  onClick={() => navigate('/context-rules')} 
                 />
                 <QuickActionCard 
                   title="Get Embed Code" 
                   icon={Code} 
-                  onClick={() => console.log('Get Embed Code')} 
+                  onClick={() => navigate('/embed-code')} 
                 />
               </div>
             </CardContent>
