@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,7 @@ import AiModelsPage from "@/pages/AiModelsPage";
 import AiModelConfigPage from "@/pages/AiModelConfigPage";
 import KnowledgeBasePage from "@/pages/KnowledgeBasePage";
 import ScraperPage from "@/pages/ScraperPage";
+import EmbedCodePage from "@/pages/EmbedCodePage";
 
 const queryClient = new QueryClient();
 
@@ -91,6 +91,11 @@ const App = () => (
           <Route path="/ai-model-config" element={
             <AppLayout>
               <AiModelConfigPage />
+            </AppLayout>
+          } />
+          <Route path="/embed-code" element={
+            <AppLayout>
+              <EmbedCodePage />
             </AppLayout>
           } />
           <Route path="*" element={<NotFound />} />
