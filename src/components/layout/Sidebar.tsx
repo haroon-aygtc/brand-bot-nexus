@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -15,7 +16,6 @@ import {
   ChevronLeft,
   Menu,
   Sliders,
-  Palette
 } from 'lucide-react';
 
 type NavItem = {
@@ -29,12 +29,10 @@ const mainNavItems: NavItem[] = [
   { title: 'Dashboard', icon: LayoutDashboard, path: '/' },
   { title: 'Widget Config', icon: Sliders, path: '/widget-config' },
   { title: 'Context Rules', icon: MessageSquare, path: '/context-rules' },
-  { title: 'Response Formatter', icon: FileText, path: '/response-formatter' },
-  { title: 'Branding', icon: Palette, path: '/branding' },
-  { title: 'Follow-up Questions', icon: MessageSquare, path: '/follow-up-questions' },
-  { title: 'Templates', icon: FileText, path: '/prompts' },
+  { title: 'Templates', icon: FileText, path: '/templates' },
   { title: 'Embed Code', icon: Code, path: '/embed-code' },
   { title: 'Analytics', icon: BarChart2, path: '/analytics' },
+  { title: 'Response Formatter', icon: FileText, path: '/response-formatter' },
   { title: 'AI Models', icon: Database, path: '/ai-models' },
   { title: 'Web Scraping', icon: Globe, path: '/scraper' },
   { title: 'User Management', icon: Users, path: '/customers' },

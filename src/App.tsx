@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,15 +9,6 @@ import Dashboard from "@/pages/Dashboard";
 import ChatPage from "@/pages/ChatPage";
 import WidgetConfigPage from "@/pages/WidgetConfigPage";
 import NotFound from "@/pages/NotFound";
-import AiModelsPage from "@/pages/AiModelsPage";
-import AiModelConfigPage from "@/pages/AiModelConfigPage";
-import KnowledgeBasePage from "@/pages/KnowledgeBasePage";
-import ScraperPage from "@/pages/ScraperPage";
-import EmbedCodePage from "@/pages/EmbedCodePage";
-import ContextRulesPage from "@/pages/ContextRulesPage";
-import ResponseFormatterPage from "@/pages/ResponseFormatterPage";
-import BrandingPage from "@/pages/BrandingPage";
-import FollowUpQuestionsPage from "@/pages/FollowUpQuestionsPage";
 
 const queryClient = new QueryClient();
 
@@ -42,19 +34,18 @@ const App = () => (
               <WidgetConfigPage />
             </AppLayout>
           } />
-          <Route path="/context-rules" element={
-            <AppLayout>
-              <ContextRulesPage />
-            </AppLayout>
-          } />
           <Route path="/knowledge" element={
             <AppLayout>
-              <KnowledgeBasePage />
+              <div className="flex items-center justify-center h-full bg-muted/30 rounded-lg border border-border">
+                <p className="text-muted-foreground">Knowledge Base - Coming Soon</p>
+              </div>
             </AppLayout>
           } />
           <Route path="/scraper" element={
             <AppLayout>
-              <ScraperPage />
+              <div className="flex items-center justify-center h-full bg-muted/30 rounded-lg border border-border">
+                <p className="text-muted-foreground">Web Scraper - Coming Soon</p>
+              </div>
             </AppLayout>
           } />
           <Route path="/customers" element={
@@ -90,36 +81,6 @@ const App = () => (
               <div className="flex items-center justify-center h-full bg-muted/30 rounded-lg border border-border">
                 <p className="text-muted-foreground">Settings - Coming Soon</p>
               </div>
-            </AppLayout>
-          } />
-          <Route path="/ai-models" element={
-            <AppLayout>
-              <AiModelsPage />
-            </AppLayout>
-          } />
-          <Route path="/ai-model-config" element={
-            <AppLayout>
-              <AiModelConfigPage />
-            </AppLayout>
-          } />
-          <Route path="/embed-code" element={
-            <AppLayout>
-              <EmbedCodePage />
-            </AppLayout>
-          } />
-          <Route path="/response-formatter" element={
-            <AppLayout>
-              <ResponseFormatterPage />
-            </AppLayout>
-          } />
-          <Route path="/branding" element={
-            <AppLayout>
-              <BrandingPage />
-            </AppLayout>
-          } />
-          <Route path="/follow-up-questions" element={
-            <AppLayout>
-              <FollowUpQuestionsPage />
             </AppLayout>
           } />
           <Route path="*" element={<NotFound />} />
