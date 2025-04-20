@@ -14,6 +14,9 @@ import KnowledgeBasePage from "@/pages/KnowledgeBasePage";
 import ScraperPage from "@/pages/ScraperPage";
 import EmbedCodePage from "@/pages/EmbedCodePage";
 import ContextRulesPage from "@/pages/ContextRulesPage";
+import ResponseFormatterPage from "@/pages/ResponseFormatterPage";
+import BrandingPage from "@/pages/BrandingPage";
+import FollowUpQuestionsPage from "@/pages/FollowUpQuestionsPage";
 
 const queryClient = new QueryClient();
 
@@ -102,6 +105,21 @@ const App = () => (
           <Route path="/embed-code" element={
             <AppLayout>
               <EmbedCodePage />
+            </AppLayout>
+          } />
+          <Route path="/response-formatter" element={
+            <AppLayout>
+              <ResponseFormatterPage />
+            </AppLayout>
+          } />
+          <Route path="/branding" element={
+            <AppLayout>
+              <BrandingPage />
+            </AppLayout>
+          } />
+          <Route path="/follow-up-questions" element={
+            <AppLayout>
+              <FollowUpQuestionsPage />
             </AppLayout>
           } />
           <Route path="*" element={<NotFound />} />
