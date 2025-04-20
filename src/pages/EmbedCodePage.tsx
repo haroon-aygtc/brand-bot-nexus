@@ -1,5 +1,4 @@
-
-import { EmbedCodeGenerator } from '@/components/widget/EmbedCodeGenerator';
+import EmbedCodeGenerator from '@/components/widget/EmbedCodeGenerator';
 
 const EmbedCodePage = () => {
   // Mock config for now - this would come from your actual widget configuration
