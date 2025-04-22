@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,9 +10,6 @@ import { BrandingConfig } from "@/components/ai-models/BrandingConfig";
 import { FollowUpQuestionsConfig } from "@/components/ai-models/FollowUpQuestionsConfig";
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
-import { ResponseFormatter } from "@/components/ai-models/ResponseFormatter";
-import { KnowledgeBaseManager } from "@/components/ai-models/KnowledgeBaseManager";
-import { PromptTemplatesManager } from "@/components/ai-models/PromptTemplatesManager";
 
 const AiModelConfigPage = () => {
   const [activeTab, setActiveTab] = useState("data-sources");
@@ -110,14 +108,14 @@ const AiModelConfigPage = () => {
           value="prompt-templates" 
           className="space-y-4 animate-fade-in"
         >
-          <PromptTemplatesManager />
+          <PromptTemplatesConfig />
         </TabsContent>
 
         <TabsContent 
           value="response-formatter" 
           className="space-y-4 animate-fade-in"
         >
-          <ResponseFormatter />
+          <ResponseFormatterConfig />
         </TabsContent>
 
         <TabsContent 
@@ -132,13 +130,6 @@ const AiModelConfigPage = () => {
           className="space-y-4 animate-fade-in"
         >
           <FollowUpQuestionsConfig />
-        </TabsContent>
-        
-        <TabsContent 
-          value="knowledge-base" 
-          className="space-y-4 animate-fade-in"
-        >
-          <KnowledgeBaseManager />
         </TabsContent>
       </Tabs>
     </div>

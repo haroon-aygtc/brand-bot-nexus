@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,11 +13,6 @@ import AiModelsPage from "@/pages/AiModelsPage";
 import AiModelConfigPage from "@/pages/AiModelConfigPage";
 import KnowledgeBasePage from "@/pages/KnowledgeBasePage";
 import ScraperPage from "@/pages/ScraperPage";
-import EmbedCodePage from "@/pages/EmbedCodePage";
-import ContextRulesPage from "@/pages/ContextRulesPage";
-import ResponseFormatterPage from "@/pages/ResponseFormatterPage";
-import BrandingPage from "@/pages/BrandingPage";
-import FollowUpQuestionsPage from "@/pages/FollowUpQuestionsPage";
 
 const queryClient = new QueryClient();
 
@@ -40,11 +36,6 @@ const App = () => (
           <Route path="/widget-config" element={
             <AppLayout>
               <WidgetConfigPage />
-            </AppLayout>
-          } />
-          <Route path="/context-rules" element={
-            <AppLayout>
-              <ContextRulesPage />
             </AppLayout>
           } />
           <Route path="/knowledge" element={
@@ -100,26 +91,6 @@ const App = () => (
           <Route path="/ai-model-config" element={
             <AppLayout>
               <AiModelConfigPage />
-            </AppLayout>
-          } />
-          <Route path="/embed-code" element={
-            <AppLayout>
-              <EmbedCodePage />
-            </AppLayout>
-          } />
-          <Route path="/response-formatter" element={
-            <AppLayout>
-              <ResponseFormatterPage />
-            </AppLayout>
-          } />
-          <Route path="/branding" element={
-            <AppLayout>
-              <BrandingPage />
-            </AppLayout>
-          } />
-          <Route path="/follow-up-questions" element={
-            <AppLayout>
-              <FollowUpQuestionsPage />
             </AppLayout>
           } />
           <Route path="*" element={<NotFound />} />
