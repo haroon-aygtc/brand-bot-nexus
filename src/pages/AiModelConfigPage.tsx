@@ -2,12 +2,13 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Settings } from "lucide-react";
 import { DataSourcesConfig } from "@/components/ai-models/DataSourcesConfig";
 import { PromptTemplatesConfig } from "@/components/ai-models/PromptTemplatesConfig";
 import { ResponseFormatterConfig } from "@/components/ai-models/ResponseFormatterConfig";
 import { BrandingConfig } from "@/components/ai-models/BrandingConfig";
 import { FollowUpQuestionsConfig } from "@/components/ai-models/FollowUpQuestionsConfig";
+import { GlobalSettings } from "@/components/ai-models/GlobalSettings";
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
 
@@ -63,75 +64,87 @@ const AiModelConfigPage = () => {
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="transition-all">
-        <TabsList className="grid grid-cols-5 mb-6">
-          <TabsTrigger 
-            value="data-sources"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
-          >
-            Data Sources
-          </TabsTrigger>
-          <TabsTrigger 
-            value="prompt-templates"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
-          >
-            Prompt Templates
-          </TabsTrigger>
-          <TabsTrigger 
-            value="response-formatter"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
-          >
-            Response Formatter
-          </TabsTrigger>
-          <TabsTrigger 
-            value="branding"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
-          >
-            Branding
-          </TabsTrigger>
-          <TabsTrigger 
-            value="follow-up"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
-          >
-            Follow-up Questions
-          </TabsTrigger>
-        </TabsList>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-1">
+          <div className="rounded-lg border overflow-hidden">
+            <div className="bg-muted p-3 border-b">
+              <h3 className="font-medium flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Configuration Options
+              </h3>
+            </div>
+            <div className="p-2">
+              <nav className="space-y-1">
+                <Button 
+                  variant={activeTab === "data-sources" ? "secondary" : "ghost"} 
+                  className="w-full justify-start text-sm font-medium"
+                  onClick={() => setActiveTab("data-sources")}
+                >
+                  Data Sources
+                </Button>
+                <Button 
+                  variant={activeTab === "prompt-templates" ? "secondary" : "ghost"} 
+                  className="w-full justify-start text-sm font-medium"
+                  onClick={() => setActiveTab("prompt-templates")}
+                >
+                  Prompt Templates
+                </Button>
+                <Button 
+                  variant={activeTab === "response-formatter" ? "secondary" : "ghost"} 
+                  className="w-full justify-start text-sm font-medium"
+                  onClick={() => setActiveTab("response-formatter")}
+                >
+                  Response Formatter
+                </Button>
+                <Button 
+                  variant={activeTab === "branding" ? "secondary" : "ghost"} 
+                  className="w-full justify-start text-sm font-medium"
+                  onClick={() => setActiveTab("branding")}
+                >
+                  Branding
+                </Button>
+                <Button 
+                  variant={activeTab === "follow-up" ? "secondary" : "ghost"} 
+                  className="w-full justify-start text-sm font-medium"
+                  onClick={() => setActiveTab("follow-up")}
+                >
+                  Follow-up Questions
+                </Button>
+                <Button 
+                  variant={activeTab === "global-settings" ? "secondary" : "ghost"} 
+                  className="w-full justify-start text-sm font-medium"
+                  onClick={() => setActiveTab("global-settings")}
+                >
+                  Global Settings
+                </Button>
+              </nav>
+            </div>
+          </div>
+        </div>
 
-        <TabsContent 
-          value="data-sources" 
-          className="space-y-4 animate-fade-in"
-        >
-          <DataSourcesConfig />
-        </TabsContent>
-
-        <TabsContent 
-          value="prompt-templates" 
-          className="space-y-4 animate-fade-in"
-        >
-          <PromptTemplatesConfig />
-        </TabsContent>
-
-        <TabsContent 
-          value="response-formatter" 
-          className="space-y-4 animate-fade-in"
-        >
-          <ResponseFormatterConfig />
-        </TabsContent>
-
-        <TabsContent 
-          value="branding" 
-          className="space-y-4 animate-fade-in"
-        >
-          <BrandingConfig />
-        </TabsContent>
-
-        <TabsContent 
-          value="follow-up" 
-          className="space-y-4 animate-fade-in"
-        >
-          <FollowUpQuestionsConfig />
-        </TabsContent>
-      </Tabs>
+        <div className="lg:col-span-3">
+          <div className="rounded-lg border overflow-hidden">
+            <div className="bg-muted p-3 border-b">
+              <h3 className="font-medium">
+                {activeTab === "data-sources" && "Data Sources"}
+                {activeTab === "prompt-templates" && "Prompt Templates"}
+                {activeTab === "response-formatter" && "Response Formatter"}
+                {activeTab === "branding" && "Branding"}
+                {activeTab === "follow-up" && "Follow-up Questions"}
+                {activeTab === "global-settings" && "Global Settings"}
+              </h3>
+            </div>
+            <div className="p-4">
+              {activeTab === "data-sources" && <DataSourcesConfig />}
+              {activeTab === "prompt-templates" && <PromptTemplatesConfig />}
+              {activeTab === "response-formatter" && <ResponseFormatterConfig />}
+              {activeTab === "branding" && <BrandingConfig />}
+              {activeTab === "follow-up" && <FollowUpQuestionsConfig />}
+              {activeTab === "global-settings" && <GlobalSettings />}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
