@@ -1,0 +1,103 @@
+
+import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Link, useNavigate } from 'react-router-dom';
+import { LogIn, Loader2 } from 'lucide-react';
+
+const SignInPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      await login(email, password);
+      navigate('/'); // Redirect to dashboard after successful login
+    } catch (error) {
+      // Error is handled in the AuthContext
+      console.error('Login error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4 py-12">
+      <div className="w-full max-w-md space-y-8 rounded-lg border bg-card p-8 shadow-sm">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold tracking-tight">Sign In</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Enter your credentials to access your account
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-primary hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              <>
+                <LogIn className="mr-2 h-4 w-4" />
+                Sign In
+              </>
+            )}
+          </Button>
+        </form>
+
+        <div className="mt-6 text-center text-sm">
+          Don't have an account?{' '}
+          <Link to="/sign-up" className="font-medium text-primary hover:underline">
+            Sign up for free
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SignInPage;

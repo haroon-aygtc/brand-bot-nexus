@@ -4,13 +4,45 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Thermometer, Zap, Cpu, RotateCw } from "lucide-react";
+import { Thermometer, Zap, Cpu, RotateCw, Save, RefreshCw } from "lucide-react";
 import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 export const AdvancedModelControls = () => {
   const [temperature, setTemperature] = useState(0.7);
   const [maxTokens, setMaxTokens] = useState(1000);
   const [topP, setTopP] = useState(0.9);
+  const [frequencyPenalty, setFrequencyPenalty] = useState(0);
+  const [presencePenalty, setPresencePenalty] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
+  const { toast } = useToast();
+  
+  const handleSave = async () => {
+    setIsSaving(true);
+    
+    // Simulate API call to save model configuration
+    setTimeout(() => {
+      toast({
+        title: "Model configuration saved",
+        description: "Your advanced model settings have been updated successfully.",
+      });
+      setIsSaving(false);
+    }, 1000);
+  };
+  
+  const handleTestModel = async () => {
+    setIsTesting(true);
+    
+    // Simulate API call to test model
+    setTimeout(() => {
+      toast({
+        title: "Model test completed",
+        description: "Test response received in 1.2 seconds with 98% success rate.",
+      });
+      setIsTesting(false);
+    }, 2000);
+  };
   
   return (
     <Card>
@@ -84,9 +116,73 @@ export const AdvancedModelControls = () => {
           </p>
         </div>
         
-        <div className="flex justify-end">
-          <Button>
-            Save Controls
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="frequency-penalty" className="text-sm">
+              Frequency Penalty
+            </Label>
+            <span className="text-sm font-medium">{frequencyPenalty}</span>
+          </div>
+          <Slider 
+            id="frequency-penalty"
+            min={-2} 
+            max={2} 
+            step={0.1} 
+            value={[frequencyPenalty]} 
+            onValueChange={(value) => setFrequencyPenalty(value[0])} 
+          />
+          <p className="text-xs text-muted-foreground">
+            Reduces repetition by penalizing tokens that have appeared already (-2.0 to 2.0)
+          </p>
+        </div>
+        
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="presence-penalty" className="text-sm">
+              Presence Penalty
+            </Label>
+            <span className="text-sm font-medium">{presencePenalty}</span>
+          </div>
+          <Slider 
+            id="presence-penalty"
+            min={-2} 
+            max={2} 
+            step={0.1} 
+            value={[presencePenalty]} 
+            onValueChange={(value) => setPresencePenalty(value[0])} 
+          />
+          <p className="text-xs text-muted-foreground">
+            Encourages the model to talk about new topics by penalizing tokens already used (-2.0 to 2.0)
+          </p>
+        </div>
+        
+        <div className="flex justify-between">
+          <Button variant="outline" onClick={handleTestModel} disabled={isTesting}>
+            {isTesting ? (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                Testing...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Test Model
+              </>
+            )}
+          </Button>
+          
+          <Button onClick={handleSave} disabled={isSaving}>
+            {isSaving ? (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Save Controls
+              </>
+            )}
           </Button>
         </div>
       </CardContent>

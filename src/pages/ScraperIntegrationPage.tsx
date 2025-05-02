@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EnhancedBrowserFrame } from '@/components/scraper/EnhancedBrowserFrame';
-import { ScrapingOptions } from '@/components/scraper/ScrapingOptions';
-import { SelectorGroupManager } from '@/components/scraper/SelectorGroupManager';
+import ScrapingOptions from '@/components/scraper/ScrapingOptions';
+import SelectorGroupManager from '@/components/scraper/SelectorGroupManager';
 import { Book, FileJson, Cpu } from 'lucide-react';
 
 interface ExtractedData {
