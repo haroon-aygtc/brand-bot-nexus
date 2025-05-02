@@ -15,7 +15,7 @@ import {
   Copy, Code, Settings, Info, Palette, MessageSquare, LayoutTemplate, 
   Smartphone, Save, Download, Sparkles, Layers, Brush, Zap, 
   Monitor, Tablet, Smartphone as PhoneIcon, MousePointer, 
-  Shuffle, Heart, FlaskConical
+  Shuffle, Heart, FlaskConical, X
 } from 'lucide-react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';

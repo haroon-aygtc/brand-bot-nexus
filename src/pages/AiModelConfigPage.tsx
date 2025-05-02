@@ -1,15 +1,18 @@
 
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Save } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Save, Settings, Database, MessageSquare, Palette, HelpCircle, Sliders } from "lucide-react";
 import { DataSourcesConfig } from "@/components/ai-models/DataSourcesConfig";
 import { PromptTemplatesConfig } from "@/components/ai-models/PromptTemplatesConfig";
 import { ResponseFormatterConfig } from "@/components/ai-models/ResponseFormatterConfig";
 import { BrandingConfig } from "@/components/ai-models/BrandingConfig";
 import { FollowUpQuestionsConfig } from "@/components/ai-models/FollowUpQuestionsConfig";
+import { GlobalSettings } from "@/components/ai-models/GlobalSettings";
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 const AiModelConfigPage = () => {
   const [activeTab, setActiveTab] = useState("data-sources");
@@ -18,120 +21,104 @@ const AiModelConfigPage = () => {
 
   const handleSave = () => {
     setSaving(true);
-    // Simulate saving
     setTimeout(() => {
       setSaving(false);
       toast.success("Configuration saved successfully");
     }, 1000);
   };
 
+  const menuItems = [
+    { id: "data-sources", label: "Data Sources", icon: Database },
+    { id: "prompt-templates", label: "Prompt Templates", icon: MessageSquare },
+    { id: "response-formatter", label: "Response Formatter", icon: Sliders },
+    { id: "branding", label: "Branding", icon: Palette },
+    { id: "follow-up", label: "Follow-up Questions", icon: HelpCircle },
+    { id: "global-settings", label: "Global Settings", icon: Settings },
+  ];
+
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+    <div className="container mx-auto py-6 animate-fade-in">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
           <Button 
             variant="ghost" 
             size="icon"
-            className="hover:bg-muted transition-colors"
             onClick={() => navigate("/ai-models")}
+            className="hover:bg-muted"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Configure GPT-4 Turbo</h1>
-            <p className="text-muted-foreground">
-              Customize how this AI model processes and responds to user queries
+            <h1 className="text-3xl font-bold tracking-tight">GPT-4 Turbo Configuration</h1>
+            <p className="text-muted-foreground mt-1">
+              Customize AI model behavior and response formatting
             </p>
           </div>
         </div>
         <Button 
           onClick={handleSave} 
           disabled={saving}
-          className="hover:scale-105 transition-transform"
+          size="lg"
+          className="gap-2"
         >
           {saving ? (
-            <span className="flex items-center">
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-              Saving...
-            </span>
+            <>
+              <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              <span>Saving...</span>
+            </>
           ) : (
             <>
-              <Save className="mr-2 h-4 w-4" />
-              Save Configuration
+              <Save className="h-4 w-4" />
+              <span>Save Changes</span>
             </>
           )}
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="transition-all">
-        <TabsList className="grid grid-cols-5 mb-6">
-          <TabsTrigger 
-            value="data-sources"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
-          >
-            Data Sources
-          </TabsTrigger>
-          <TabsTrigger 
-            value="prompt-templates"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
-          >
-            Prompt Templates
-          </TabsTrigger>
-          <TabsTrigger 
-            value="response-formatter"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
-          >
-            Response Formatter
-          </TabsTrigger>
-          <TabsTrigger 
-            value="branding"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
-          >
-            Branding
-          </TabsTrigger>
-          <TabsTrigger 
-            value="follow-up"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
-          >
-            Follow-up Questions
-          </TabsTrigger>
-        </TabsList>
+      <div className="grid grid-cols-12 gap-6">
+        <Card className="col-span-3">
+          <CardHeader>
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Configuration
+            </CardTitle>
+          </CardHeader>
+          <ScrollArea className="h-[calc(100vh-280px)]">
+            <CardContent className="p-2">
+              {menuItems.map((item) => (
+                <Button
+                  key={item.id}
+                  variant={activeTab === item.id ? "secondary" : "ghost"}
+                  className="w-full justify-start gap-2 mb-1"
+                  onClick={() => setActiveTab(item.id)}
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </Button>
+              ))}
+            </CardContent>
+          </ScrollArea>
+        </Card>
 
-        <TabsContent 
-          value="data-sources" 
-          className="space-y-4 animate-fade-in"
-        >
-          <DataSourcesConfig />
-        </TabsContent>
-
-        <TabsContent 
-          value="prompt-templates" 
-          className="space-y-4 animate-fade-in"
-        >
-          <PromptTemplatesConfig />
-        </TabsContent>
-
-        <TabsContent 
-          value="response-formatter" 
-          className="space-y-4 animate-fade-in"
-        >
-          <ResponseFormatterConfig />
-        </TabsContent>
-
-        <TabsContent 
-          value="branding" 
-          className="space-y-4 animate-fade-in"
-        >
-          <BrandingConfig />
-        </TabsContent>
-
-        <TabsContent 
-          value="follow-up" 
-          className="space-y-4 animate-fade-in"
-        >
-          <FollowUpQuestionsConfig />
-        </TabsContent>
-      </Tabs>
+        <div className="col-span-9">
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {menuItems.find(item => item.id === activeTab)?.label}
+              </CardTitle>
+            </CardHeader>
+            <Separator />
+            <CardContent className="p-6">
+              {activeTab === "data-sources" && <DataSourcesConfig />}
+              {activeTab === "prompt-templates" && <PromptTemplatesConfig />}
+              {activeTab === "response-formatter" && <ResponseFormatterConfig />}
+              {activeTab === "branding" && <BrandingConfig />}
+              {activeTab === "follow-up" && <FollowUpQuestionsConfig />}
+              {activeTab === "global-settings" && <GlobalSettings />}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };
