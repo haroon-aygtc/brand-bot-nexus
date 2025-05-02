@@ -1,6 +1,5 @@
 
-// This file simulates a database with localStorage for persistence
-// Later, this will be replaced with real API calls to Laravel backend
+import { User, Tenant, AiModel, KnowledgeItem, Chat, ChatMessage } from '@/types/mockDb';
 
 // Helper to get data from localStorage with proper typing
 const getStoredData = <T>(key: string, defaultValue: T): T => {

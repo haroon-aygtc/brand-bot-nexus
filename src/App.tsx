@@ -18,6 +18,7 @@ import ScraperPage from "@/pages/ScraperPage";
 import SignInPage from "@/pages/SignInPage";
 import SignUpPage from "@/pages/SignUpPage";
 import SystemSettingsPage from "@/pages/SystemSettingsPage";
+import UserManagementPage from "@/pages/UserManagementPage";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +94,13 @@ const App = () => (
                   <div className="flex items-center justify-center h-full bg-muted/30 rounded-lg border border-border">
                     <p className="text-muted-foreground">Prompt Management - Coming Soon</p>
                   </div>
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/users" element={
+              <ProtectedRoute requiredRole="admin">
+                <AppLayout>
+                  <UserManagementPage />
                 </AppLayout>
               </ProtectedRoute>
             } />
