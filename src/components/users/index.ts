@@ -1,2 +1,4 @@
 
-export { default as UserManagement } from './UserManagement';
+import UserManagement from './UserManagement';
+
+export { UserManagement };

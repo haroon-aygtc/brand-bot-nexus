@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { UserManagement } from '@/components/users/UserManagement';
+import UserManagement from '@/components/users/UserManagement';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserPlus, ShieldCheck, Settings } from 'lucide-react';
