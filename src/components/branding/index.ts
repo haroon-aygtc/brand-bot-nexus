@@ -1,2 +1,4 @@
 
-export { default as BrandingManager } from './BrandingManager';
+import BrandingManager from './BrandingManager';
+
+export { BrandingManager };

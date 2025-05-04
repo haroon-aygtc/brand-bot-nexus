@@ -7,8 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { ColorPicker } from '@/components/widget/ColorPicker';
-import { TemplatePresets } from '@/components/widget/TemplatePresets';
+import ColorPicker from '@/components/widget/ColorPicker';
+import TemplatePresets from '@/components/widget/TemplatePresets';
 import { Upload, RefreshCw } from 'lucide-react';
 
 interface Template {

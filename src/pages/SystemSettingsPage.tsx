@@ -2,10 +2,10 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SystemSettingsManager } from '@/components/settings/SystemSettingsManager';
-import { BrandingManager } from '@/components/branding/BrandingManager';
-import { ResponseFormatter } from '@/components/response-formatter/ResponseFormatter';
-import { FollowUpBuilder } from '@/components/follow-up/FollowUpBuilder';
+import SystemSettingsManager from '@/components/settings/SystemSettingsManager';
+import BrandingManager from '@/components/branding/BrandingManager';
+import ResponseFormatter from '@/components/response-formatter/ResponseFormatter';
+import FollowUpBuilder from '@/components/follow-up/FollowUpBuilder';
 
 const SystemSettingsPage = () => {
   return (

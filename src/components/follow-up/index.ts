@@ -1,2 +1,4 @@
 
-export { default as FollowUpBuilder } from './FollowUpBuilder';
+import FollowUpBuilder from './FollowUpBuilder';
+
+export { FollowUpBuilder };

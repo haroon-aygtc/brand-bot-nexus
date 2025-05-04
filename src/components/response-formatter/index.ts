@@ -1,2 +1,4 @@
 
-export { default as ResponseFormatter } from './ResponseFormatter';
+import ResponseFormatter from './ResponseFormatter';
+
+export { ResponseFormatter };

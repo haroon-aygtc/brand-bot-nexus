@@ -1,2 +1,4 @@
 
-export { default as SystemSettingsManager } from './SystemSettingsManager';
+import SystemSettingsManager from './SystemSettingsManager';
+
+export { SystemSettingsManager };
