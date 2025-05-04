@@ -26,7 +26,11 @@ const AddUserDialog: React.FC<AddUserDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Add New User</DialogTitle>
         </DialogHeader>
-        <UserForm data={userData} onChange={onUserDataChange} />
+        <UserForm 
+          data={userData} 
+          onChange={onUserDataChange} 
+          isNewUser={true}
+        />
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel

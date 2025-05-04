@@ -41,7 +41,6 @@ export const api = {
       
       // Store token in localStorage
       localStorage.setItem('authToken', response.token);
-      localStorage.setItem('currentUser', JSON.stringify(response.user));
       
       return response;
     },
@@ -54,7 +53,6 @@ export const api = {
       
       // Store token in localStorage
       localStorage.setItem('authToken', response.token);
-      localStorage.setItem('currentUser', JSON.stringify(response.user));
       
       return response;
     },
@@ -66,7 +64,6 @@ export const api = {
       
       // Remove token from localStorage
       localStorage.removeItem('authToken');
-      localStorage.removeItem('currentUser');
       
       return response;
     },

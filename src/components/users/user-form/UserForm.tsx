@@ -8,14 +8,16 @@ export interface UserFormData {
   name: string;
   email: string;
   role: 'admin' | 'user' | 'guest';
+  password?: string;
 }
 
 interface UserFormProps {
   data: UserFormData;
   onChange: (data: UserFormData) => void;
+  isNewUser?: boolean;
 }
 
-const UserForm: React.FC<UserFormProps> = ({ data, onChange }) => {
+const UserForm: React.FC<UserFormProps> = ({ data, onChange, isNewUser = false }) => {
   return (
     <div className="space-y-4 py-2">
       <div className="space-y-2">
@@ -35,6 +37,17 @@ const UserForm: React.FC<UserFormProps> = ({ data, onChange }) => {
           onChange={(e) => onChange({ ...data, email: e.target.value })}
         />
       </div>
+      {isNewUser && (
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            type="password"
+            value={data.password || ''}
+            onChange={(e) => onChange({ ...data, password: e.target.value })}
+          />
+        </div>
+      )}
       <div className="space-y-2">
         <Label htmlFor="role">Role</Label>
         <Select

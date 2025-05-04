@@ -23,6 +23,10 @@ class AiModel extends Model
         'max_tokens',
         'system_prompt',
         'enabled',
+        'api_key',
+        'usage_count',
+        'usage_tokens',
+        'settings',
     ];
 
     /**
@@ -34,5 +38,17 @@ class AiModel extends Model
         'temperature' => 'float',
         'max_tokens' => 'integer',
         'enabled' => 'boolean',
+        'usage_count' => 'integer',
+        'usage_tokens' => 'integer',
+        'settings' => 'json',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'api_key',
     ];
 }

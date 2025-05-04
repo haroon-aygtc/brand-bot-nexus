@@ -19,6 +19,18 @@ class ChatMessage extends Model
         'chat_id',
         'role',
         'content',
+        'tokens',
+        'metadata',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'tokens' => 'integer',
+        'metadata' => 'json',
     ];
 
     /**

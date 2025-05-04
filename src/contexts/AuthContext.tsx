@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
+  // Check if user is authenticated on initial load
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -31,7 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } catch (error) {
         // Token invalid or expired
         localStorage.removeItem('authToken');
-        localStorage.removeItem('currentUser');
+        console.error('Authentication error:', error);
       } finally {
         setIsLoading(false);
       }
@@ -43,8 +44,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const { user } = await api.auth.login(email, password);
+      const { user, token } = await api.auth.login(email, password);
       setUser(user);
+      // Properly format Laravel user data to match our frontend User type
+      const formattedUser: User = {
+        id: user.id.toString(),
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        tenantId: user.tenant_id ? user.tenant_id.toString() : undefined,
+        createdAt: user.created_at,
+        updatedAt: user.updated_at
+      };
+      setUser(formattedUser);
       toast({
         title: "Login successful",
         description: `Welcome back, ${user.name}!`,
@@ -64,8 +76,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const register = async (name: string, email: string, password: string) => {
     setIsLoading(true);
     try {
-      const { user } = await api.auth.register({ name, email, password });
-      setUser(user);
+      const { user, token } = await api.auth.register({ name, email, password });
+      // Properly format Laravel user data to match our frontend User type
+      const formattedUser: User = {
+        id: user.id.toString(),
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        tenantId: user.tenant_id ? user.tenant_id.toString() : undefined,
+        createdAt: user.created_at,
+        updatedAt: user.updated_at
+      };
+      setUser(formattedUser);
       toast({
         title: "Registration successful",
         description: `Welcome, ${user.name}!`,

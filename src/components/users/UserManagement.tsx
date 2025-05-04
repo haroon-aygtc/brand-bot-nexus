@@ -8,7 +8,7 @@ import { useApi } from '@/hooks/useApi';
 import { api } from '@/lib/api';
 import { User } from '@/types/mockDb';
 
-// Import our new components
+// Import our components
 import UserTable from './user-table/UserTable';
 import UserSearch from './user-search/UserSearch';
 import AddUserDialog from './user-dialogs/AddUserDialog';
@@ -23,13 +23,34 @@ const UserManagement = () => {
   const [newUser, setNewUser] = useState({
     name: '',
     email: '',
-    role: 'user' as 'admin' | 'user' | 'guest'
+    role: 'user' as 'admin' | 'user' | 'guest',
+    password: '' // Add password field for creating new users
   });
   
   const { toast } = useToast();
   const { data: users, isLoading, execute: fetchUsers } = useApi(async () => {
-    const users = await api.users.getAll();
-    return users;
+    try {
+      const apiUsers = await api.users.getAll();
+      
+      // Map API response to match our User type
+      return apiUsers.map((user: any) => ({
+        id: user.id.toString(),
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        tenantId: user.tenant_id ? user.tenant_id.toString() : undefined,
+        createdAt: user.created_at,
+        updatedAt: user.updated_at
+      }));
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch users",
+        variant: "destructive"
+      });
+      return [];
+    }
   });
   
   useEffect(() => {
@@ -46,7 +67,8 @@ const UserManagement = () => {
       setNewUser({
         name: '',
         email: '',
-        role: 'user'
+        role: 'user',
+        password: ''
       });
       toast({
         title: "User created",
@@ -103,7 +125,7 @@ const UserManagement = () => {
     }
   };
   
-  const filteredUsers = filterUsers(users, searchQuery);
+  const filteredUsers = filterUsers(users || [], searchQuery);
   
   return (
     <Card>
