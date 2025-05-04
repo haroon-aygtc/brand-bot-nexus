@@ -1,244 +1,210 @@
 
-import mockDb from './mockDb';
 import type { User, Tenant, AiModel, KnowledgeItem, Chat, ChatMessage } from '../types/mockDb';
 
-// Add delay to simulate network latency
-const withDelay = <T>(data: T, delay = 300): Promise<T> => {
-  return new Promise(resolve => setTimeout(() => resolve(data), delay));
+// Define the API base URL
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+
+// Helper function to fetch with authorization
+const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
+  const token = localStorage.getItem('authToken');
+  
+  const headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...options.headers,
+  };
+
+  const response = await fetch(`${API_URL}${url}`, {
+    ...options,
+    headers,
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || `Request failed with status ${response.status}`);
+  }
+
+  return response.json();
 };
 
-// Simulated API error
-class ApiError extends Error {
-  status: number;
-  
-  constructor(message: string, status: number) {
-    super(message);
-    this.name = 'ApiError';
-    this.status = status;
-  }
-}
-
-// API client that will be replaced with real API calls later
+// API client
 export const api = {
   // Authentication
   auth: {
     login: async (email: string, password: string) => {
-      // Simulate authentication
-      const users = mockDb.users.getAll();
-      const user = users.find(u => u.email === email);
+      const response = await fetchWithAuth('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
       
-      if (!user) {
-        throw new ApiError('Invalid credentials', 401);
-      }
+      // Store token in localStorage
+      localStorage.setItem('authToken', response.token);
+      localStorage.setItem('currentUser', JSON.stringify(response.user));
       
-      // In a real app, we would validate password here
-      
-      // Create and store token in localStorage
-      const token = `mock-token-${Date.now()}`;
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      
-      return withDelay({ user, token });
+      return response;
     },
     
     register: async (userData: { name: string; email: string; password: string }) => {
-      const users = mockDb.users.getAll();
-      const existingUser = users.find(u => u.email === userData.email);
-      
-      if (existingUser) {
-        throw new ApiError('User already exists', 409);
-      }
-      
-      const newUser = mockDb.users.create({
-        email: userData.email,
-        name: userData.name,
-        role: 'user',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+      const response = await fetchWithAuth('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(userData),
       });
       
-      // Create and store token
-      const token = `mock-token-${Date.now()}`;
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
+      // Store token in localStorage
+      localStorage.setItem('authToken', response.token);
+      localStorage.setItem('currentUser', JSON.stringify(response.user));
       
-      return withDelay({ user: newUser, token });
+      return response;
     },
     
     logout: async () => {
+      const response = await fetchWithAuth('/auth/logout', {
+        method: 'POST',
+      });
+      
+      // Remove token from localStorage
       localStorage.removeItem('authToken');
       localStorage.removeItem('currentUser');
-      return withDelay({ success: true });
+      
+      return response;
     },
     
     getCurrentUser: async () => {
-      const userData = localStorage.getItem('currentUser');
-      if (!userData) {
-        throw new ApiError('Not authenticated', 401);
+      // If we don't have a token, consider the user not authenticated
+      if (!localStorage.getItem('authToken')) {
+        throw new Error('Not authenticated');
       }
-      return withDelay(JSON.parse(userData) as User);
+      
+      return fetchWithAuth('/auth/user');
     }
   },
   
   // Users
   users: {
-    getAll: async () => withDelay(mockDb.users.getAll()),
-    getById: async (id: string) => {
-      const user = mockDb.users.getById(id);
-      if (!user) throw new ApiError('User not found', 404);
-      return withDelay(user);
-    },
-    create: async (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => {
-      return withDelay(mockDb.users.create({
-        ...userData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }));
-    },
-    update: async (id: string, userData: Partial<User>) => {
-      const user = mockDb.users.getById(id);
-      if (!user) throw new ApiError('User not found', 404);
-      return withDelay(mockDb.users.update(id, {
-        ...userData,
-        updatedAt: new Date().toISOString()
-      }));
-    },
-    delete: async (id: string) => {
-      const user = mockDb.users.getById(id);
-      if (!user) throw new ApiError('User not found', 404);
-      mockDb.users.delete(id);
-      return withDelay({ success: true });
-    }
+    getAll: async () => fetchWithAuth('/users'),
+    
+    getById: async (id: string) => fetchWithAuth(`/users/${id}`),
+    
+    create: async (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => 
+      fetchWithAuth('/users', {
+        method: 'POST',
+        body: JSON.stringify(userData),
+      }),
+    
+    update: async (id: string, userData: Partial<User>) => 
+      fetchWithAuth(`/users/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(userData),
+      }),
+    
+    delete: async (id: string) => 
+      fetchWithAuth(`/users/${id}`, {
+        method: 'DELETE',
+      }),
   },
   
   // Tenants
   tenants: {
-    getAll: async () => withDelay(mockDb.tenants.getAll()),
-    getById: async (id: string) => {
-      const tenant = mockDb.tenants.getById(id);
-      if (!tenant) throw new ApiError('Tenant not found', 404);
-      return withDelay(tenant);
-    },
-    create: async (tenantData: Omit<Tenant, 'id' | 'createdAt' | 'updatedAt'>) => {
-      return withDelay(mockDb.tenants.create({
-        ...tenantData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }));
-    },
-    update: async (id: string, tenantData: Partial<Tenant>) => {
-      const tenant = mockDb.tenants.getById(id);
-      if (!tenant) throw new ApiError('Tenant not found', 404);
-      return withDelay(mockDb.tenants.update(id, {
-        ...tenantData,
-        updatedAt: new Date().toISOString()
-      }));
-    },
-    delete: async (id: string) => {
-      const tenant = mockDb.tenants.getById(id);
-      if (!tenant) throw new ApiError('Tenant not found', 404);
-      mockDb.tenants.delete(id);
-      return withDelay({ success: true });
-    }
+    getAll: async () => fetchWithAuth('/tenants'),
+    
+    getById: async (id: string) => fetchWithAuth(`/tenants/${id}`),
+    
+    create: async (tenantData: Omit<Tenant, 'id' | 'createdAt' | 'updatedAt'>) => 
+      fetchWithAuth('/tenants', {
+        method: 'POST',
+        body: JSON.stringify(tenantData),
+      }),
+    
+    update: async (id: string, tenantData: Partial<Tenant>) => 
+      fetchWithAuth(`/tenants/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(tenantData),
+      }),
+    
+    delete: async (id: string) => 
+      fetchWithAuth(`/tenants/${id}`, {
+        method: 'DELETE',
+      }),
   },
   
   // AI Models
   aiModels: {
-    getAll: async () => withDelay(mockDb.aiModels.getAll()),
-    getById: async (id: string) => {
-      const model = mockDb.aiModels.getById(id);
-      if (!model) throw new ApiError('AI Model not found', 404);
-      return withDelay(model);
-    },
-    create: async (modelData: Omit<AiModel, 'id' | 'createdAt' | 'updatedAt'>) => {
-      return withDelay(mockDb.aiModels.create({
-        ...modelData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }));
-    },
-    update: async (id: string, modelData: Partial<AiModel>) => {
-      const model = mockDb.aiModels.getById(id);
-      if (!model) throw new ApiError('AI Model not found', 404);
-      return withDelay(mockDb.aiModels.update(id, {
-        ...modelData,
-        updatedAt: new Date().toISOString()
-      }));
-    },
-    delete: async (id: string) => {
-      const model = mockDb.aiModels.getById(id);
-      if (!model) throw new ApiError('AI Model not found', 404);
-      mockDb.aiModels.delete(id);
-      return withDelay({ success: true });
-    }
+    getAll: async () => fetchWithAuth('/ai-models'),
+    
+    getById: async (id: string) => fetchWithAuth(`/ai-models/${id}`),
+    
+    create: async (modelData: Omit<AiModel, 'id' | 'createdAt' | 'updatedAt'>) => 
+      fetchWithAuth('/ai-models', {
+        method: 'POST',
+        body: JSON.stringify(modelData),
+      }),
+    
+    update: async (id: string, modelData: Partial<AiModel>) => 
+      fetchWithAuth(`/ai-models/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(modelData),
+      }),
+    
+    delete: async (id: string) => 
+      fetchWithAuth(`/ai-models/${id}`, {
+        method: 'DELETE',
+      }),
   },
   
   // Knowledge Base
   knowledgeBase: {
-    getAll: async () => withDelay(mockDb.knowledgeBase.getAll()),
-    getById: async (id: string) => {
-      const item = mockDb.knowledgeBase.getById(id);
-      if (!item) throw new ApiError('Knowledge item not found', 404);
-      return withDelay(item);
-    },
-    create: async (itemData: Omit<KnowledgeItem, 'id' | 'createdAt' | 'updatedAt'>) => {
-      return withDelay(mockDb.knowledgeBase.create({
-        ...itemData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }));
-    },
-    update: async (id: string, itemData: Partial<KnowledgeItem>) => {
-      const item = mockDb.knowledgeBase.getById(id);
-      if (!item) throw new ApiError('Knowledge item not found', 404);
-      return withDelay(mockDb.knowledgeBase.update(id, {
-        ...itemData,
-        updatedAt: new Date().toISOString()
-      }));
-    },
-    delete: async (id: string) => {
-      const item = mockDb.knowledgeBase.getById(id);
-      if (!item) throw new ApiError('Knowledge item not found', 404);
-      mockDb.knowledgeBase.delete(id);
-      return withDelay({ success: true });
-    }
+    getAll: async () => fetchWithAuth('/knowledge-base'),
+    
+    getById: async (id: string) => fetchWithAuth(`/knowledge-base/${id}`),
+    
+    create: async (itemData: Omit<KnowledgeItem, 'id' | 'createdAt' | 'updatedAt'>) => 
+      fetchWithAuth('/knowledge-base', {
+        method: 'POST',
+        body: JSON.stringify(itemData),
+      }),
+    
+    update: async (id: string, itemData: Partial<KnowledgeItem>) => 
+      fetchWithAuth(`/knowledge-base/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(itemData),
+      }),
+    
+    delete: async (id: string) => 
+      fetchWithAuth(`/knowledge-base/${id}`, {
+        method: 'DELETE',
+      }),
   },
   
   // Chats
   chats: {
-    getAll: async () => withDelay(mockDb.chats.getAll()),
-    getById: async (id: string) => {
-      const chat = mockDb.chats.getById(id);
-      if (!chat) throw new ApiError('Chat not found', 404);
-      return withDelay(chat);
-    },
-    create: async (chatData: Omit<Chat, 'id' | 'createdAt' | 'updatedAt' | 'messages'>) => {
-      return withDelay(mockDb.chats.create({
-        ...chatData,
-        messages: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }));
-    },
-    update: async (id: string, chatData: Partial<Chat>) => {
-      const chat = mockDb.chats.getById(id);
-      if (!chat) throw new ApiError('Chat not found', 404);
-      return withDelay(mockDb.chats.update(id, {
-        ...chatData,
-        updatedAt: new Date().toISOString()
-      }));
-    },
-    delete: async (id: string) => {
-      const chat = mockDb.chats.getById(id);
-      if (!chat) throw new ApiError('Chat not found', 404);
-      mockDb.chats.delete(id);
-      return withDelay({ success: true });
-    },
-    addMessage: async (chatId: string, message: Omit<ChatMessage, 'id'>) => {
-      const chat = mockDb.chats.getById(chatId);
-      if (!chat) throw new ApiError('Chat not found', 404);
-      return withDelay(mockDb.chats.addMessage(chatId, message));
-    }
+    getAll: async () => fetchWithAuth('/chats'),
+    
+    getById: async (id: string) => fetchWithAuth(`/chats/${id}`),
+    
+    create: async (chatData: Omit<Chat, 'id' | 'createdAt' | 'updatedAt' | 'messages'>) => 
+      fetchWithAuth('/chats', {
+        method: 'POST',
+        body: JSON.stringify(chatData),
+      }),
+    
+    update: async (id: string, chatData: Partial<Chat>) => 
+      fetchWithAuth(`/chats/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(chatData),
+      }),
+    
+    delete: async (id: string) => 
+      fetchWithAuth(`/chats/${id}`, {
+        method: 'DELETE',
+      }),
+    
+    addMessage: async (chatId: string, message: Omit<ChatMessage, 'id'>) => 
+      fetchWithAuth(`/chats/${chatId}/messages`, {
+        method: 'POST',
+        body: JSON.stringify(message),
+      }),
   }
 };
 
