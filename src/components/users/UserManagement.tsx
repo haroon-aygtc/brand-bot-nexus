@@ -1,32 +1,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  MoreHorizontal, 
-  Search, 
-  UserPlus, 
-  Edit,
-  Trash2,
-  Shield,
-  Check
-} from 'lucide-react';
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { User } from '@/types/mockDb';
-import { useApi } from '@/hooks/useApi';
+import { UserPlus } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { useApi } from '@/hooks/useApi';
 import { api } from '@/lib/api';
+import { User } from '@/types/mockDb';
+
+// Import our new components
+import UserTable from './user-table/UserTable';
+import UserSearch from './user-search/UserSearch';
+import AddUserDialog from './user-dialogs/AddUserDialog';
+import EditUserDialog from './user-dialogs/EditUserDialog';
+import { getRoleBadgeVariant, filterUsers } from './utils/userUtils';
 
 const UserManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -116,24 +103,7 @@ const UserManagement = () => {
     }
   };
   
-  const filteredUsers = users?.filter(user => 
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.role.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
-  const getRoleBadgeVariant = (role: string) => {
-    switch(role) {
-      case 'admin':
-        return 'default';
-      case 'user':
-        return 'secondary';
-      case 'guest':
-        return 'outline';
-      default:
-        return 'outline';
-    }
-  };
+  const filteredUsers = filterUsers(users, searchQuery);
   
   return (
     <Card>
@@ -145,196 +115,41 @@ const UserManagement = () => {
         </Button>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center mb-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search users..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </div>
+        {/* Search Component */}
+        <UserSearch 
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
         
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">
-                    Loading users...
-                  </TableCell>
-                </TableRow>
-              ) : filteredUsers && filteredUsers.length > 0 ? (
-                filteredUsers.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <Badge variant={getRoleBadgeVariant(user.role)}>
-                        {user.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setSelectedUser(user);
-                              setIsEditUserOpen(true);
-                            }}
-                          >
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            className="text-destructive focus:text-destructive"
-                            onClick={() => handleDeleteUser(user.id)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">
-                    No users found
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        {/* Table Component */}
+        <UserTable 
+          users={filteredUsers}
+          isLoading={isLoading}
+          onEditUser={(user) => {
+            setSelectedUser(user);
+            setIsEditUserOpen(true);
+          }}
+          onDeleteUser={handleDeleteUser}
+          getRoleBadgeVariant={getRoleBadgeVariant}
+        />
         
         {/* Add User Dialog */}
-        <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New User</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-2">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  value={newUser.name}
-                  onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={newUser.email}
-                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="role">Role</Label>
-                <Select
-                  value={newUser.role}
-                  onValueChange={(value) => setNewUser({ ...newUser, role: value as 'admin' | 'user' | 'guest' })}
-                >
-                  <SelectTrigger id="role">
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="user">User</SelectItem>
-                    <SelectItem value="guest">Guest</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddUserOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleAddUser}>
-                <Check className="mr-2 h-4 w-4" />
-                Create User
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <AddUserDialog 
+          isOpen={isAddUserOpen}
+          onOpenChange={setIsAddUserOpen}
+          userData={newUser}
+          onUserDataChange={setNewUser}
+          onAddUser={handleAddUser}
+        />
         
         {/* Edit User Dialog */}
-        <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit User</DialogTitle>
-            </DialogHeader>
-            {selectedUser && (
-              <div className="space-y-4 py-2">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-name">Full Name</Label>
-                  <Input
-                    id="edit-name"
-                    value={selectedUser.name}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, name: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-email">Email</Label>
-                  <Input
-                    id="edit-email"
-                    type="email"
-                    value={selectedUser.email}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-role">Role</Label>
-                  <Select
-                    value={selectedUser.role}
-                    onValueChange={(value) => setSelectedUser({ ...selectedUser, role: value as 'admin' | 'user' | 'guest' })}
-                  >
-                    <SelectTrigger id="edit-role">
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="user">User</SelectItem>
-                      <SelectItem value="guest">Guest</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            )}
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsEditUserOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleUpdateUser}>
-                <Check className="mr-2 h-4 w-4" />
-                Update User
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <EditUserDialog 
+          isOpen={isEditUserOpen}
+          onOpenChange={setIsEditUserOpen}
+          selectedUser={selectedUser}
+          onSelectedUserChange={setSelectedUser}
+          onUpdateUser={handleUpdateUser}
+        />
       </CardContent>
     </Card>
   );
