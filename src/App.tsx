@@ -17,10 +17,24 @@ import KnowledgeBasePage from "@/pages/KnowledgeBasePage";
 import ScraperPage from "@/pages/ScraperPage";
 import SignInPage from "@/pages/SignInPage";
 import SignUpPage from "@/pages/SignUpPage";
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
+import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import SystemSettingsPage from "@/pages/SystemSettingsPage";
 import UserManagementPage from "@/pages/UserManagementPage";
+import ContextRulesPage from "@/pages/ContextRulesPage";
+import EmbedCodePage from "@/pages/EmbedCodePage";
+import TemplatesPage from "@/pages/TemplatesPage";
+import ResponseFormatterPage from "@/pages/ResponseFormatterPage";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -33,6 +47,8 @@ const App = () => (
             {/* Authentication Routes */}
             <Route path="/sign-in" element={<SignInPage />} />
             <Route path="/sign-up" element={<SignUpPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             
             {/* Protected Routes */}
             <Route path="/" element={
@@ -67,6 +83,34 @@ const App = () => (
               <ProtectedRoute>
                 <AppLayout>
                   <ScraperPage />
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/context-rules" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <ContextRulesPage />
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/templates" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <TemplatesPage />
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/embed-code" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <EmbedCodePage />
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/response-formatter" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <ResponseFormatterPage />
                 </AppLayout>
               </ProtectedRoute>
             } />

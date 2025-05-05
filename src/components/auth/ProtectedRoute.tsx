@@ -8,8 +8,8 @@ interface ProtectedRouteProps {
   requiredRole?: 'admin' | 'user' | 'guest';
 }
 
-const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
-  const { isAuthenticated, user, isLoading } = useAuth();
+const ProtectedRoute = ({ children, requiredRole = 'user' }: ProtectedRouteProps) => {
+  const { isAuthenticated, isLoading, hasPermission } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -25,9 +25,9 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
     return <Navigate to="/sign-in" state={{ from: location }} replace />;
   }
 
-  // Check if user has the required role
-  if (requiredRole && user?.role !== requiredRole && requiredRole !== 'guest') {
-    // Redirect to the home page if user doesn't have the required role
+  // Check if user has the required role using the hasPermission function
+  if (!hasPermission(requiredRole)) {
+    // Redirect to the home page if user doesn't have the required permission
     return <Navigate to="/" replace />;
   }
 

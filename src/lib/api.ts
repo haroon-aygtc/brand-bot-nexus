@@ -15,18 +15,49 @@ const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
     ...options.headers,
   };
 
-  const response = await fetch(`${API_URL}${url}`, {
-    ...options,
-    headers,
-    credentials: 'include',
-  });
+  try {
+    const response = await fetch(`${API_URL}${url}`, {
+      ...options,
+      headers,
+      credentials: 'include',
+    });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `Request failed with status ${response.status}`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const errorMessage = errorData.message || `Request failed with status ${response.status}`;
+      
+      // Handle specific error codes
+      if (response.status === 401) {
+        // Clear token if unauthorized
+        localStorage.removeItem('authToken');
+        throw new Error('Unauthorized access. Please log in again.');
+      }
+      
+      if (response.status === 403) {
+        throw new Error('You do not have permission to access this resource.');
+      }
+      
+      if (response.status === 404) {
+        throw new Error('The requested resource was not found.');
+      }
+      
+      if (response.status === 422) {
+        // Validation errors
+        const validationErrors = errorData.errors ? Object.values(errorData.errors).flat() : [];
+        throw new Error(validationErrors.length ? validationErrors.join(', ') : errorMessage);
+      }
+      
+      throw new Error(errorMessage);
+    }
+
+    return response.json();
+  } catch (error) {
+    // Rethrow network errors
+    if (error instanceof TypeError && error.message === 'Failed to fetch') {
+      throw new Error('Network error. Please check your connection and try again.');
+    }
+    throw error;
   }
-
-  return response.json();
 };
 
 // API client
@@ -75,12 +106,39 @@ export const api = {
       }
       
       return fetchWithAuth('/auth/user');
-    }
+    },
+    
+    refreshToken: async () => {
+      return fetchWithAuth('/auth/refresh', {
+        method: 'POST',
+      });
+    },
+    
+    requestPasswordReset: async (email: string) => {
+      return fetchWithAuth('/auth/password/email', {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+      });
+    },
+    
+    resetPassword: async (token: string, password: string) => {
+      return fetchWithAuth('/auth/password/reset', {
+        method: 'POST',
+        body: JSON.stringify({ token, password, password_confirmation: password }),
+      });
+    },
   },
   
   // Users
   users: {
-    getAll: async () => fetchWithAuth('/users'),
+    getAll: async (page = 1, limit = 10, search = '') => {
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
+      if (search) params.append('search', search);
+      
+      return fetchWithAuth(`/users?${params.toString()}`);
+    },
     
     getById: async (id: string) => fetchWithAuth(`/users/${id}`),
     
@@ -104,7 +162,13 @@ export const api = {
   
   // Tenants
   tenants: {
-    getAll: async () => fetchWithAuth('/tenants'),
+    getAll: async (page = 1, limit = 10) => {
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
+      
+      return fetchWithAuth(`/tenants?${params.toString()}`);
+    },
     
     getById: async (id: string) => fetchWithAuth(`/tenants/${id}`),
     
@@ -128,7 +192,13 @@ export const api = {
   
   // AI Models
   aiModels: {
-    getAll: async () => fetchWithAuth('/ai-models'),
+    getAll: async (page = 1, limit = 10) => {
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
+      
+      return fetchWithAuth(`/ai-models?${params.toString()}`);
+    },
     
     getById: async (id: string) => fetchWithAuth(`/ai-models/${id}`),
     
@@ -152,7 +222,14 @@ export const api = {
   
   // Knowledge Base
   knowledgeBase: {
-    getAll: async () => fetchWithAuth('/knowledge-base'),
+    getAll: async (page = 1, limit = 10, search = '') => {
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
+      if (search) params.append('search', search);
+      
+      return fetchWithAuth(`/knowledge-base?${params.toString()}`);
+    },
     
     getById: async (id: string) => fetchWithAuth(`/knowledge-base/${id}`),
     
@@ -176,7 +253,13 @@ export const api = {
   
   // Chats
   chats: {
-    getAll: async () => fetchWithAuth('/chats'),
+    getAll: async (page = 1, limit = 10) => {
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
+      
+      return fetchWithAuth(`/chats?${params.toString()}`);
+    },
     
     getById: async (id: string) => fetchWithAuth(`/chats/${id}`),
     

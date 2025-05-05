@@ -11,6 +11,9 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<void>;
+  resetPassword: (token: string, newPassword: string) => Promise<void>;
+  hasPermission: (requiredRole: 'admin' | 'user' | 'guest') => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,6 +31,9 @@ const DEMO_ADMIN_USER: User = {
 // Demo admin credentials
 const DEMO_ADMIN_EMAIL = 'admin@example.com';
 const DEMO_ADMIN_PASSWORD = 'admin123';
+
+// Token refresh interval (5 minutes)
+const TOKEN_REFRESH_INTERVAL = 5 * 60 * 1000;
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -59,6 +65,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     loadUser();
   }, []);
+
+  // Set up token refresh
+  useEffect(() => {
+    if (!user || user.id === DEMO_ADMIN_USER.id) return; // Skip for demo admin
+
+    const refreshToken = async () => {
+      try {
+        // Implement token refresh logic here
+        await api.auth.refreshToken();
+      } catch (error) {
+        console.error('Token refresh error:', error);
+        // If refresh fails, log out the user
+        if (error instanceof Error && error.message === 'Token expired') {
+          logout();
+          toast({
+            title: "Session expired",
+            description: "Your session has expired. Please log in again.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    const intervalId = setInterval(refreshToken, TOKEN_REFRESH_INTERVAL);
+    return () => clearInterval(intervalId);
+  }, [user, toast]);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
@@ -142,8 +174,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     setIsLoading(true);
     try {
-      await api.auth.logout();
+      // Only attempt API logout for real users, not demo admin
+      if (user && user.id !== DEMO_ADMIN_USER.id) {
+        await api.auth.logout();
+      }
+      
+      // Always clear local state
+      localStorage.removeItem('authToken');
       setUser(null);
+      
       toast({
         title: "Logged out",
         description: "You have been successfully logged out",
@@ -159,6 +198,56 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Add password reset functionality
+  const requestPasswordReset = async (email: string) => {
+    setIsLoading(true);
+    try {
+      await api.auth.requestPasswordReset(email);
+      toast({
+        title: "Password reset email sent",
+        description: "Check your email for instructions to reset your password",
+      });
+    } catch (error) {
+      toast({
+        title: "Password reset request failed",
+        description: error instanceof Error ? error.message : "Could not request password reset",
+        variant: "destructive",
+      });
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetPassword = async (token: string, newPassword: string) => {
+    setIsLoading(true);
+    try {
+      await api.auth.resetPassword(token, newPassword);
+      toast({
+        title: "Password reset successful",
+        description: "Your password has been updated. You can now log in with your new password.",
+      });
+    } catch (error) {
+      toast({
+        title: "Password reset failed",
+        description: error instanceof Error ? error.message : "Could not reset password",
+        variant: "destructive",
+      });
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Add role-based access control
+  const hasPermission = (requiredRole: 'admin' | 'user' | 'guest') => {
+    if (!user) return false;
+    if (requiredRole === 'guest') return true;
+    if (requiredRole === 'user') return ['user', 'admin'].includes(user.role);
+    if (requiredRole === 'admin') return user.role === 'admin';
+    return false;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -168,6 +257,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         register,
         logout,
+        requestPasswordReset,
+        resetPassword,
+        hasPermission,
       }}
     >
       {children}

@@ -17,12 +17,14 @@ import {
   Menu,
   Sliders,
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 type NavItem = {
   title: string;
   icon: React.ElementType;
   path: string;
   badge?: number;
+  requiredRole?: 'admin' | 'user' | 'guest';
 };
 
 const mainNavItems: NavItem[] = [
@@ -35,12 +37,27 @@ const mainNavItems: NavItem[] = [
   { title: 'Response Formatter', icon: FileText, path: '/response-formatter' },
   { title: 'AI Models', icon: Database, path: '/ai-models' },
   { title: 'Web Scraping', icon: Globe, path: '/scraper' },
-  { title: 'User Management', icon: Users, path: '/customers' },
+  { title: 'User Management', icon: Users, path: '/users', requiredRole: 'admin' },
 ];
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const { logout, user } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  // Filter menu items based on user role
+  const filteredNavItems = mainNavItems.filter(item => {
+    if (!item.requiredRole) return true;
+    return user?.role === item.requiredRole;
+  });
 
   return (
     <div
@@ -85,8 +102,8 @@ const Sidebar = () => {
               />
             </div>
             <div className="overflow-hidden">
-              <h3 className="text-sm font-medium text-white truncate">Admin User</h3>
-              <p className="text-xs text-gray-400 truncate">admin@example.com</p>
+              <h3 className="text-sm font-medium text-white truncate">{user?.name || 'Admin User'}</h3>
+              <p className="text-xs text-gray-400 truncate">{user?.email || 'admin@example.com'}</p>
             </div>
           </div>
         ) : (
@@ -104,7 +121,7 @@ const Sidebar = () => {
 
       <nav className="flex-1 overflow-y-auto py-4 custom-scrollbar">
         <ul className="space-y-1 px-3">
-          {mainNavItems.map((item) => (
+          {filteredNavItems.map((item) => (
             <li key={item.title}>
               <Link
                 to={item.path}
@@ -129,13 +146,13 @@ const Sidebar = () => {
       </nav>
 
       <div className="p-3 mt-auto border-t border-[#2e3846]">
-        <Link
-          to="/logout"
-          className="flex items-center gap-3 px-3 py-2 text-sm rounded-md text-gray-400 hover:bg-[#2e3846] hover:text-white transition-colors"
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 w-full px-3 py-2 text-sm rounded-md text-gray-400 hover:bg-[#2e3846] hover:text-white transition-colors"
         >
           <LogOut size={18} />
           {!collapsed && <span>Logout</span>}
-        </Link>
+        </button>
       </div>
     </div>
   );
