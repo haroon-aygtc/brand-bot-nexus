@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Link, useNavigate } from 'react-router-dom';
-import { LogIn, Loader2 } from 'lucide-react';
+import { LogIn, Loader2, UserCheck } from 'lucide-react';
+import { api } from '@/lib/api';
 
 const SignInPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDemoLoggingIn, setIsDemoLoggingIn] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -26,6 +28,20 @@ const SignInPage = () => {
       console.error('Login error:', error);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDemoAdminLogin = async () => {
+    setIsDemoLoggingIn(true);
+    
+    try {
+      // Use demo admin credentials
+      await login('admin@example.com', 'admin123');
+      navigate('/'); // Redirect to dashboard after successful login
+    } catch (error) {
+      console.error('Demo login error:', error);
+    } finally {
+      setIsDemoLoggingIn(false);
     }
   };
 
@@ -88,6 +104,31 @@ const SignInPage = () => {
             )}
           </Button>
         </form>
+
+        {/* Demo Admin Login Button */}
+        <div className="mt-4">
+          <Button 
+            variant="outline" 
+            className="w-full border-dashed" 
+            onClick={handleDemoAdminLogin}
+            disabled={isDemoLoggingIn}
+          >
+            {isDemoLoggingIn ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Accessing Admin...
+              </>
+            ) : (
+              <>
+                <UserCheck className="mr-2 h-4 w-4" />
+                Demo Admin Login
+              </>
+            )}
+          </Button>
+          <p className="mt-2 text-xs text-center text-muted-foreground">
+            Click to instantly access the dashboard as an admin user for testing
+          </p>
+        </div>
 
         <div className="mt-6 text-center text-sm">
           Don't have an account?{' '}

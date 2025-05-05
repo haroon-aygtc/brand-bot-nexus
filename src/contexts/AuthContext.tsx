@@ -15,6 +15,20 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Mock admin user for demo purposes
+const DEMO_ADMIN_USER: User = {
+  id: 'admin-demo-1',
+  name: 'Demo Admin',
+  email: 'admin@example.com',
+  role: 'admin',
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+};
+
+// Demo admin credentials
+const DEMO_ADMIN_EMAIL = 'admin@example.com';
+const DEMO_ADMIN_PASSWORD = 'admin123';
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,8 +40,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         const token = localStorage.getItem('authToken');
         if (token) {
-          const currentUser = await api.auth.getCurrentUser();
-          setUser(currentUser);
+          // Check if we have a demo admin token
+          if (token === 'demo-admin-token') {
+            setUser(DEMO_ADMIN_USER);
+          } else {
+            const currentUser = await api.auth.getCurrentUser();
+            setUser(currentUser);
+          }
         }
       } catch (error) {
         // Token invalid or expired
@@ -44,8 +63,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
+      // Check if using demo admin credentials
+      if (email === DEMO_ADMIN_EMAIL && password === DEMO_ADMIN_PASSWORD) {
+        // Set demo admin user and token
+        setUser(DEMO_ADMIN_USER);
+        localStorage.setItem('authToken', 'demo-admin-token');
+        
+        toast({
+          title: "Demo admin login successful",
+          description: "You're now logged in as a demo administrator",
+        });
+        
+        setIsLoading(false);
+        return;
+      }
+      
+      // Regular login flow
       const { user, token } = await api.auth.login(email, password);
-      setUser(user);
+      
       // Properly format Laravel user data to match our frontend User type
       const formattedUser: User = {
         id: user.id.toString(),
