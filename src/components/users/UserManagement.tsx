@@ -14,13 +14,14 @@ import UserSearch from './user-search/UserSearch';
 import AddUserDialog from './user-dialogs/AddUserDialog';
 import EditUserDialog from './user-dialogs/EditUserDialog';
 import { getRoleBadgeVariant, filterUsers } from './utils/userUtils';
+import { UserFormData } from './user-form/UserForm';
 
 const UserManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [newUser, setNewUser] = useState({
+  const [newUser, setNewUser] = useState<UserFormData>({
     name: '',
     email: '',
     role: 'user' as 'admin' | 'user' | 'guest',
@@ -127,6 +128,11 @@ const UserManagement = () => {
   
   const filteredUsers = filterUsers(users || [], searchQuery);
   
+  // Define a handler function to update the newUser state
+  const handleUserDataChange = (data: UserFormData) => {
+    setNewUser(data);
+  };
+  
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -160,7 +166,7 @@ const UserManagement = () => {
           isOpen={isAddUserOpen}
           onOpenChange={setIsAddUserOpen}
           userData={newUser}
-          onUserDataChange={setNewUser}
+          onUserDataChange={handleUserDataChange}
           onAddUser={handleAddUser}
         />
         
