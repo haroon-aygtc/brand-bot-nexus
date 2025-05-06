@@ -36,6 +36,7 @@ const mainNavItems: NavItem[] = [
   { title: 'Analytics', icon: BarChart2, path: '/analytics' },
   { title: 'Response Formatter', icon: FileText, path: '/response-formatter' },
   { title: 'AI Models', icon: Database, path: '/ai-models' },
+  { title: 'AI Configuration', icon: Settings, path: '/ai-config' },
   { title: 'Web Scraping', icon: Globe, path: '/scraper' },
   { title: 'User Management', icon: Users, path: '/users', requiredRole: 'admin' },
 ];
