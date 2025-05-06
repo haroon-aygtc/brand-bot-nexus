@@ -66,3 +66,24 @@ export function useGetTenants() {
 export function useGetUsers() {
   return useApi(api.users.getAll);
 }
+
+// New specialized hooks for AI configuration
+export function useGetDataSources() {
+  return useApi(api.aiConfig.dataSources.getAll);
+}
+
+export function useGetPromptTemplates() {
+  return useApi(api.aiConfig.promptTemplates.getAll);
+}
+
+export function useGetResponseFormatters() {
+  return useApi(api.aiConfig.responseFormatters.getAll);
+}
+
+export function useGetBrandingSettings() {
+  return useApi(api.aiConfig.branding.getSettings);
+}
+
+export function useGetFollowUpQuestions() {
+  return useApi(api.aiConfig.followUpQuestions.getAll);
+}

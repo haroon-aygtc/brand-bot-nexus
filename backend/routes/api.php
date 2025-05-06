@@ -9,6 +9,7 @@ use App\Http\Controllers\TenantController;
 use App\Http\Controllers\AiModelController;
 use App\Http\Controllers\KnowledgeItemController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\AiConfigController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,4 +47,40 @@ Route::middleware('auth:sanctum')->group(function () {
     // Chats
     Route::apiResource('chats', ChatController::class);
     Route::post('/chats/{chat}/messages', [ChatController::class, 'addMessage']);
+    
+    // AI Configuration
+    Route::prefix('ai-config')->group(function () {
+        // Data Sources
+        Route::get('/data-sources', [AiConfigController::class, 'getDataSources']);
+        Route::get('/data-sources/{id}', [AiConfigController::class, 'getDataSource']);
+        Route::post('/data-sources', [AiConfigController::class, 'createDataSource']);
+        Route::put('/data-sources/{id}', [AiConfigController::class, 'updateDataSource']);
+        Route::delete('/data-sources/{id}', [AiConfigController::class, 'deleteDataSource']);
+        
+        // Prompt Templates
+        Route::get('/prompt-templates', [AiConfigController::class, 'getPromptTemplates']);
+        Route::get('/prompt-templates/{id}', [AiConfigController::class, 'getPromptTemplate']);
+        Route::post('/prompt-templates', [AiConfigController::class, 'createPromptTemplate']);
+        Route::put('/prompt-templates/{id}', [AiConfigController::class, 'updatePromptTemplate']);
+        Route::delete('/prompt-templates/{id}', [AiConfigController::class, 'deletePromptTemplate']);
+        
+        // Response Formatters
+        Route::get('/response-formatters', [AiConfigController::class, 'getResponseFormatters']);
+        Route::get('/response-formatters/{id}', [AiConfigController::class, 'getResponseFormatter']);
+        Route::post('/response-formatters', [AiConfigController::class, 'createResponseFormatter']);
+        Route::put('/response-formatters/{id}', [AiConfigController::class, 'updateResponseFormatter']);
+        Route::delete('/response-formatters/{id}', [AiConfigController::class, 'deleteResponseFormatter']);
+        
+        // Branding
+        Route::get('/branding', [AiConfigController::class, 'getBrandingSettings']);
+        Route::put('/branding', [AiConfigController::class, 'updateBrandingSettings']);
+        Route::post('/branding/logo', [AiConfigController::class, 'uploadLogo']);
+        
+        // Follow-up Questions
+        Route::get('/follow-up-questions', [AiConfigController::class, 'getFollowUpQuestions']);
+        Route::get('/follow-up-questions/{id}', [AiConfigController::class, 'getFollowUpQuestion']);
+        Route::post('/follow-up-questions', [AiConfigController::class, 'createFollowUpQuestion']);
+        Route::put('/follow-up-questions/{id}', [AiConfigController::class, 'updateFollowUpQuestion']);
+        Route::delete('/follow-up-questions/{id}', [AiConfigController::class, 'deleteFollowUpQuestion']);
+    });
 });

@@ -1,4 +1,3 @@
-
 import type { User, Tenant, AiModel, KnowledgeItem, Chat, ChatMessage } from '../types/mockDb';
 
 // Define the API base URL
@@ -285,6 +284,127 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(message),
       }),
+  },
+  
+  // AI Configuration
+  aiConfig: {
+    // Data Sources
+    dataSources: {
+      getAll: async () => fetchWithAuth('/ai-config/data-sources'),
+      
+      getById: async (id: string) => fetchWithAuth(`/ai-config/data-sources/${id}`),
+      
+      create: async (data: any) => 
+        fetchWithAuth('/ai-config/data-sources', {
+          method: 'POST',
+          body: JSON.stringify(data),
+        }),
+      
+      update: async (id: string, data: any) => 
+        fetchWithAuth(`/ai-config/data-sources/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(data),
+        }),
+      
+      delete: async (id: string) => 
+        fetchWithAuth(`/ai-config/data-sources/${id}`, {
+          method: 'DELETE',
+        }),
+    },
+    
+    // Prompt Templates
+    promptTemplates: {
+      getAll: async () => fetchWithAuth('/ai-config/prompt-templates'),
+      
+      getById: async (id: string) => fetchWithAuth(`/ai-config/prompt-templates/${id}`),
+      
+      create: async (data: any) => 
+        fetchWithAuth('/ai-config/prompt-templates', {
+          method: 'POST',
+          body: JSON.stringify(data),
+        }),
+      
+      update: async (id: string, data: any) => 
+        fetchWithAuth(`/ai-config/prompt-templates/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(data),
+        }),
+      
+      delete: async (id: string) => 
+        fetchWithAuth(`/ai-config/prompt-templates/${id}`, {
+          method: 'DELETE',
+        }),
+    },
+    
+    // Response Formatter
+    responseFormatters: {
+      getAll: async () => fetchWithAuth('/ai-config/response-formatters'),
+      
+      getById: async (id: string) => fetchWithAuth(`/ai-config/response-formatters/${id}`),
+      
+      create: async (data: any) => 
+        fetchWithAuth('/ai-config/response-formatters', {
+          method: 'POST',
+          body: JSON.stringify(data),
+        }),
+      
+      update: async (id: string, data: any) => 
+        fetchWithAuth(`/ai-config/response-formatters/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(data),
+        }),
+      
+      delete: async (id: string) => 
+        fetchWithAuth(`/ai-config/response-formatters/${id}`, {
+          method: 'DELETE',
+        }),
+    },
+    
+    // Branding
+    branding: {
+      getSettings: async () => fetchWithAuth('/ai-config/branding'),
+      
+      updateSettings: async (data: any) => 
+        fetchWithAuth('/ai-config/branding', {
+          method: 'PUT',
+          body: JSON.stringify(data),
+        }),
+      
+      uploadLogo: async (file: File) => {
+        const formData = new FormData();
+        formData.append('logo', file);
+        
+        return fetchWithAuth('/ai-config/branding/logo', {
+          method: 'POST',
+          body: formData,
+          headers: {}, // Let the browser set the content type with boundary
+        });
+      },
+    },
+    
+    // Follow-up Questions
+    followUpQuestions: {
+      getAll: async () => fetchWithAuth('/ai-config/follow-up-questions'),
+      
+      getById: async (id: string) => fetchWithAuth(`/ai-config/follow-up-questions/${id}`),
+      
+      create: async (data: any) => 
+        fetchWithAuth('/ai-config/follow-up-questions', {
+          method: 'POST',
+          body: JSON.stringify(data),
+        }),
+      
+      update: async (id: string, data: any) => 
+        fetchWithAuth(`/ai-config/follow-up-questions/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(data),
+        }),
+      
+      delete: async (id: string) => 
+        fetchWithAuth(`/ai-config/follow-up-questions/${id}`, {
+          method: 'DELETE',
+        }),
+    },
   }
 };
 
