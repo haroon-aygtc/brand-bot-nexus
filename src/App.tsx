@@ -25,6 +25,8 @@ import ContextRulesPage from "@/pages/ContextRulesPage";
 import EmbedCodePage from "@/pages/EmbedCodePage";
 import TemplatesPage from "@/pages/TemplatesPage";
 import ResponseFormatterPage from "@/pages/ResponseFormatterPage";
+import { AiConfigRoutes } from "@/components/ai-config";
+import AiConfigPage from "@/pages/AiConfigPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -175,6 +177,13 @@ const App = () => (
               <ProtectedRoute>
                 <AppLayout>
                   <AiModelConfigPage />
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/ai-config/*" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <AiConfigRoutes />
                 </AppLayout>
               </ProtectedRoute>
             } />
