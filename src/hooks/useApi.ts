@@ -67,23 +67,79 @@ export function useGetUsers() {
   return useApi(api.users.getAll);
 }
 
-// New specialized hooks for AI configuration
+// Specialized hooks for AI configuration
 export function useGetDataSources() {
   return useApi(api.aiConfig.dataSources.getAll);
+}
+
+export function useCreateDataSource() {
+  return useApi(api.aiConfig.dataSources.create);
+}
+
+export function useUpdateDataSource() {
+  return useApi(api.aiConfig.dataSources.update);
+}
+
+export function useDeleteDataSource() {
+  return useApi(api.aiConfig.dataSources.delete);
 }
 
 export function useGetPromptTemplates() {
   return useApi(api.aiConfig.promptTemplates.getAll);
 }
 
+export function useCreatePromptTemplate() {
+  return useApi(api.aiConfig.promptTemplates.create);
+}
+
+export function useUpdatePromptTemplate() {
+  return useApi(api.aiConfig.promptTemplates.update);
+}
+
+export function useDeletePromptTemplate() {
+  return useApi(api.aiConfig.promptTemplates.delete);
+}
+
 export function useGetResponseFormatters() {
   return useApi(api.aiConfig.responseFormatters.getAll);
+}
+
+export function useCreateResponseFormatter() {
+  return useApi(api.aiConfig.responseFormatters.create);
+}
+
+export function useUpdateResponseFormatter() {
+  return useApi(api.aiConfig.responseFormatters.update);
+}
+
+export function useDeleteResponseFormatter() {
+  return useApi(api.aiConfig.responseFormatters.delete);
 }
 
 export function useGetBrandingSettings() {
   return useApi(api.aiConfig.branding.getSettings);
 }
 
+export function useUpdateBrandingSettings() {
+  return useApi(api.aiConfig.branding.updateSettings);
+}
+
+export function useUploadBrandingLogo() {
+  return useApi(api.aiConfig.branding.uploadLogo);
+}
+
 export function useGetFollowUpQuestions() {
   return useApi(api.aiConfig.followUpQuestions.getAll);
+}
+
+export function useCreateFollowUpQuestion() {
+  return useApi(api.aiConfig.followUpQuestions.create);
+}
+
+export function useUpdateFollowUpQuestion() {
+  return useApi(api.aiConfig.followUpQuestions.update);
+}
+
+export function useDeleteFollowUpQuestion() {
+  return useApi(api.aiConfig.followUpQuestions.delete);
 }
