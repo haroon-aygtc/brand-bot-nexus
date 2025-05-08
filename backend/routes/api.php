@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // AI Models
     Route::apiResource('ai-models', AiModelController::class);
+    Route::post('/ai-models/{aiModel}/test', [AiModelController::class, 'testModel']);
     
     // Knowledge Base
     Route::apiResource('knowledge-base', KnowledgeItemController::class);
