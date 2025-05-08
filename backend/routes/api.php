@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\AiModelController;
 use App\Http\Controllers\KnowledgeItemController;
@@ -34,6 +36,15 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Users
     Route::apiResource('users', UserController::class);
+    Route::post('/users/{user}/roles', [UserController::class, 'assignRoles']);
+    Route::get('/users/{user}/permissions', [UserController::class, 'getPermissions']);
+    
+    // Roles
+    Route::apiResource('roles', RoleController::class);
+    Route::post('/roles/{role}/permissions', [RoleController::class, 'assignPermissions']);
+    
+    // Permissions
+    Route::apiResource('permissions', PermissionController::class);
     
     // Tenants
     Route::apiResource('tenants', TenantController::class);

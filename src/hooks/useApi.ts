@@ -105,6 +105,51 @@ export function useGetUsers() {
   return useApi(api.users.getAll);
 }
 
+// User, Role, and Permission hooks
+export function useGetRoles() {
+  return useApi(api.roles.getAll);
+}
+
+export function useCreateRole() {
+  return useApi(api.roles.create);
+}
+
+export function useUpdateRole() {
+  return useApiWithParams<any, string, any>(api.roles.update);
+}
+
+export function useDeleteRole() {
+  return useApi(api.roles.delete);
+}
+
+export function useAssignPermissionsToRole() {
+  return useApiWithParams<any, string, any>(api.roles.assignPermissions);
+}
+
+export function useGetPermissions() {
+  return useApi(api.permissions.getAll);
+}
+
+export function useCreatePermission() {
+  return useApi(api.permissions.create);
+}
+
+export function useUpdatePermission() {
+  return useApiWithParams<any, string, any>(api.permissions.update);
+}
+
+export function useDeletePermission() {
+  return useApi(api.permissions.delete);
+}
+
+export function useAssignRolesToUser() {
+  return useApiWithParams<any, string, any>(api.users.assignRoles);
+}
+
+export function useGetUserPermissions() {
+  return useApi(api.users.getPermissions);
+}
+
 // Specialized hooks for AI configuration
 export function useGetDataSources() {
   return useApi(api.aiConfig.dataSources.getAll);

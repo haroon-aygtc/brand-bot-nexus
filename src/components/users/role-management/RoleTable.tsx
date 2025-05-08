@@ -13,23 +13,22 @@ import {
   MoreHorizontal, 
   Edit,
   Trash2,
+  ShieldCheck
 } from 'lucide-react';
-import { User } from '@/types/mockDb';
+import { Role } from '@/types/mockDb';
 
-interface UserTableProps {
-  users: User[] | null;
+interface RoleTableProps {
+  roles: Role[];
   isLoading: boolean;
-  onEditUser: (user: User) => void;
-  onDeleteUser: (id: string) => void;
-  getRoleBadgeVariant: (role: string) => "default" | "secondary" | "outline";
+  onEditRole: (role: Role) => void;
+  onDeleteRole: (id: string) => void;
 }
 
-const UserTable: React.FC<UserTableProps> = ({
-  users,
+const RoleTable: React.FC<RoleTableProps> = ({
+  roles,
   isLoading,
-  onEditUser,
-  onDeleteUser,
-  getRoleBadgeVariant
+  onEditRole,
+  onDeleteRole
 }) => {
   return (
     <div className="rounded-md border">
@@ -37,9 +36,9 @@ const UserTable: React.FC<UserTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Roles</TableHead>
-            <TableHead>Created</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead>Permissions</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead className="w-[100px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -47,31 +46,35 @@ const UserTable: React.FC<UserTableProps> = ({
           {isLoading ? (
             <TableRow>
               <TableCell colSpan={5} className="text-center py-8">
-                Loading users...
+                Loading roles...
               </TableCell>
             </TableRow>
-          ) : users && users.length > 0 ? (
-            users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
+          ) : roles && roles.length > 0 ? (
+            roles.map((role) => (
+              <TableRow key={role.id}>
+                <TableCell className="font-medium">{role.name}</TableCell>
+                <TableCell>{role.description || '-'}</TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
-                    {user.roles && user.roles.length > 0 ? (
-                      user.roles.map((role) => (
-                        <Badge key={role.id} variant={getRoleBadgeVariant(role.slug)}>
-                          {role.name}
-                        </Badge>
-                      ))
-                    ) : (
-                      <Badge variant={getRoleBadgeVariant(user.role)}>
-                        {user.role}
+                    {role.permissions?.slice(0, 3).map((permission) => (
+                      <Badge key={permission.id} variant="outline" className="mr-1">
+                        {permission.name}
                       </Badge>
+                    ))}
+                    {role.permissions && role.permissions.length > 3 && (
+                      <Badge variant="outline">+{role.permissions.length - 3} more</Badge>
+                    )}
+                    {(!role.permissions || role.permissions.length === 0) && (
+                      <span className="text-muted-foreground text-sm">No permissions</span>
                     )}
                   </div>
                 </TableCell>
                 <TableCell>
-                  {new Date(user.createdAt).toLocaleDateString()}
+                  {role.is_default ? (
+                    <Badge variant="secondary">Default</Badge>
+                  ) : (
+                    <Badge variant="outline">Custom</Badge>
+                  )}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
@@ -82,14 +85,15 @@ const UserTable: React.FC<UserTableProps> = ({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
-                        onClick={() => onEditUser(user)}
+                        onClick={() => onEditRole(role)}
                       >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         className="text-destructive focus:text-destructive"
-                        onClick={() => onDeleteUser(user.id)}
+                        onClick={() => onDeleteRole(role.id)}
+                        disabled={role.is_default}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
@@ -102,7 +106,7 @@ const UserTable: React.FC<UserTableProps> = ({
           ) : (
             <TableRow>
               <TableCell colSpan={5} className="text-center py-8">
-                No users found
+                No roles found
               </TableCell>
             </TableRow>
           )}
@@ -112,4 +116,4 @@ const UserTable: React.FC<UserTableProps> = ({
   );
 };
 
-export default UserTable;
+export default RoleTable;

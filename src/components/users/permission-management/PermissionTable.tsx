@@ -13,23 +13,22 @@ import {
   MoreHorizontal, 
   Edit,
   Trash2,
+  Key
 } from 'lucide-react';
-import { User } from '@/types/mockDb';
+import { Permission } from '@/types/mockDb';
 
-interface UserTableProps {
-  users: User[] | null;
+interface PermissionTableProps {
+  permissions: Permission[];
   isLoading: boolean;
-  onEditUser: (user: User) => void;
-  onDeleteUser: (id: string) => void;
-  getRoleBadgeVariant: (role: string) => "default" | "secondary" | "outline";
+  onEditPermission: (permission: Permission) => void;
+  onDeletePermission: (id: string) => void;
 }
 
-const UserTable: React.FC<UserTableProps> = ({
-  users,
+const PermissionTable: React.FC<PermissionTableProps> = ({
+  permissions,
   isLoading,
-  onEditUser,
-  onDeleteUser,
-  getRoleBadgeVariant
+  onEditPermission,
+  onDeletePermission
 }) => {
   return (
     <div className="rounded-md border">
@@ -37,9 +36,9 @@ const UserTable: React.FC<UserTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Roles</TableHead>
-            <TableHead>Created</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead>Module</TableHead>
+            <TableHead>Slug</TableHead>
             <TableHead className="w-[100px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -47,31 +46,23 @@ const UserTable: React.FC<UserTableProps> = ({
           {isLoading ? (
             <TableRow>
               <TableCell colSpan={5} className="text-center py-8">
-                Loading users...
+                Loading permissions...
               </TableCell>
             </TableRow>
-          ) : users && users.length > 0 ? (
-            users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
+          ) : permissions && permissions.length > 0 ? (
+            permissions.map((permission) => (
+              <TableRow key={permission.id}>
+                <TableCell className="font-medium">{permission.name}</TableCell>
+                <TableCell>{permission.description || '-'}</TableCell>
                 <TableCell>
-                  <div className="flex flex-wrap gap-1">
-                    {user.roles && user.roles.length > 0 ? (
-                      user.roles.map((role) => (
-                        <Badge key={role.id} variant={getRoleBadgeVariant(role.slug)}>
-                          {role.name}
-                        </Badge>
-                      ))
-                    ) : (
-                      <Badge variant={getRoleBadgeVariant(user.role)}>
-                        {user.role}
-                      </Badge>
-                    )}
-                  </div>
+                  <Badge variant="outline">
+                    {permission.module || 'General'}
+                  </Badge>
                 </TableCell>
                 <TableCell>
-                  {new Date(user.createdAt).toLocaleDateString()}
+                  <code className="bg-muted px-1 py-0.5 rounded text-xs">
+                    {permission.slug}
+                  </code>
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
@@ -82,14 +73,14 @@ const UserTable: React.FC<UserTableProps> = ({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
-                        onClick={() => onEditUser(user)}
+                        onClick={() => onEditPermission(permission)}
                       >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         className="text-destructive focus:text-destructive"
-                        onClick={() => onDeleteUser(user.id)}
+                        onClick={() => onDeletePermission(permission.id)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
@@ -102,7 +93,7 @@ const UserTable: React.FC<UserTableProps> = ({
           ) : (
             <TableRow>
               <TableCell colSpan={5} className="text-center py-8">
-                No users found
+                No permissions found
               </TableCell>
             </TableRow>
           )}
@@ -112,4 +103,4 @@ const UserTable: React.FC<UserTableProps> = ({
   );
 };
 
-export default UserTable;
+export default PermissionTable;

@@ -1,13 +1,35 @@
-
 // User types
 export interface User {
   id: string;
-  email: string;
   name: string;
+  email: string;
   role: 'admin' | 'user' | 'guest';
+  roles?: Role[];
   tenantId?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+// Role and Permission types
+export interface Role {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  is_default?: boolean;
+  permissions?: Permission[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Permission {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  module?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Tenant types

@@ -1,9 +1,10 @@
 
 import React from 'react';
 import UserManagement from '@/components/users/UserManagement';
+import RoleManagement from '@/components/users/role-management/RoleManagement';
+import PermissionManagement from '@/components/users/permission-management/PermissionManagement';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { UserPlus, ShieldCheck, Settings } from 'lucide-react';
+import { UserPlus, ShieldCheck, Key, Settings } from 'lucide-react';
 
 const UserManagementPage = () => {
   return (
@@ -23,7 +24,11 @@ const UserManagementPage = () => {
           </TabsTrigger>
           <TabsTrigger value="roles" className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4" />
-            Roles & Permissions
+            Roles
+          </TabsTrigger>
+          <TabsTrigger value="permissions" className="flex items-center gap-2">
+            <Key className="h-4 w-4" />
+            Permissions
           </TabsTrigger>
           <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
@@ -36,35 +41,17 @@ const UserManagementPage = () => {
         </TabsContent>
         
         <TabsContent value="roles">
-          <Card>
-            <CardHeader>
-              <CardTitle>Role Management</CardTitle>
-              <CardDescription>
-                Configure roles and their associated permissions
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-center h-48 border rounded-md border-dashed">
-                <p className="text-muted-foreground">Role Management UI - Coming Soon</p>
-              </div>
-            </CardContent>
-          </Card>
+          <RoleManagement />
+        </TabsContent>
+        
+        <TabsContent value="permissions">
+          <PermissionManagement />
         </TabsContent>
         
         <TabsContent value="settings">
-          <Card>
-            <CardHeader>
-              <CardTitle>Access Control Settings</CardTitle>
-              <CardDescription>
-                Configure global access control policies
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-center h-48 border rounded-md border-dashed">
-                <p className="text-muted-foreground">Access Control Settings - Coming Soon</p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="flex items-center justify-center h-48 border rounded-md border-dashed">
+            <p className="text-muted-foreground">Access Control Settings - Coming Soon</p>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

@@ -1,4 +1,5 @@
-import type { User, Tenant, AiModel, KnowledgeItem, Chat, ChatMessage } from '../types/mockDb';
+
+import type { User, Tenant, AiModel, KnowledgeItem, Chat, ChatMessage, Role, Permission } from '../types/mockDb';
 
 // Define the API base URL
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
@@ -155,6 +156,80 @@ export const api = {
     
     delete: async (id: string) => 
       fetchWithAuth(`/users/${id}`, {
+        method: 'DELETE',
+      }),
+      
+    assignRoles: async (userId: string, roleIds: string[]) => 
+      fetchWithAuth(`/users/${userId}/roles`, {
+        method: 'POST',
+        body: JSON.stringify({ roles: roleIds }),
+      }),
+      
+    getPermissions: async (userId: string) => 
+      fetchWithAuth(`/users/${userId}/permissions`),
+  },
+  
+  // Roles
+  roles: {
+    getAll: async (page = 1, limit = 10) => {
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
+      
+      return fetchWithAuth(`/roles?${params.toString()}`);
+    },
+    
+    getById: async (id: string) => fetchWithAuth(`/roles/${id}`),
+    
+    create: async (roleData: Omit<Role, 'id' | 'createdAt' | 'updatedAt'>) => 
+      fetchWithAuth('/roles', {
+        method: 'POST',
+        body: JSON.stringify(roleData),
+      }),
+    
+    update: async (id: string, roleData: Partial<Role>) => 
+      fetchWithAuth(`/roles/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(roleData),
+      }),
+    
+    delete: async (id: string) => 
+      fetchWithAuth(`/roles/${id}`, {
+        method: 'DELETE',
+      }),
+      
+    assignPermissions: async (roleId: string, permissionIds: string[]) => 
+      fetchWithAuth(`/roles/${roleId}/permissions`, {
+        method: 'POST',
+        body: JSON.stringify({ permissions: permissionIds }),
+      }),
+  },
+  
+  // Permissions
+  permissions: {
+    getAll: async (module = '') => {
+      const params = new URLSearchParams();
+      if (module) params.append('module', module);
+      
+      return fetchWithAuth(`/permissions?${params.toString()}`);
+    },
+    
+    getById: async (id: string) => fetchWithAuth(`/permissions/${id}`),
+    
+    create: async (permissionData: Omit<Permission, 'id' | 'createdAt' | 'updatedAt'>) => 
+      fetchWithAuth('/permissions', {
+        method: 'POST',
+        body: JSON.stringify(permissionData),
+      }),
+    
+    update: async (id: string, permissionData: Partial<Permission>) => 
+      fetchWithAuth(`/permissions/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(permissionData),
+      }),
+    
+    delete: async (id: string) => 
+      fetchWithAuth(`/permissions/${id}`, {
         method: 'DELETE',
       }),
   },

@@ -25,7 +25,8 @@ const UserManagement = () => {
     name: '',
     email: '',
     role: 'user' as 'admin' | 'user' | 'guest',
-    password: '' // Add password field for creating new users
+    password: '',
+    roles: []
   });
   
   const { toast } = useToast();
@@ -39,9 +40,10 @@ const UserManagement = () => {
         name: user.name,
         email: user.email,
         role: user.role,
+        roles: user.roles || [],
         tenantId: user.tenant_id ? user.tenant_id.toString() : undefined,
-        createdAt: user.created_at,
-        updatedAt: user.updated_at
+        createdAt: user.created_at || new Date().toISOString(),
+        updatedAt: user.updated_at || new Date().toISOString()
       }));
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -60,16 +62,19 @@ const UserManagement = () => {
   
   const handleAddUser = async () => {
     try {
-      await api.users.create({
+      const userData = {
         ...newUser,
         tenantId: undefined,
-      });
+      };
+      
+      await api.users.create(userData);
       setIsAddUserOpen(false);
       setNewUser({
         name: '',
         email: '',
         role: 'user',
-        password: ''
+        password: '',
+        roles: []
       });
       toast({
         title: "User created",
@@ -89,11 +94,14 @@ const UserManagement = () => {
     if (!selectedUser) return;
     
     try {
-      await api.users.update(selectedUser.id, {
+      const userData = {
         name: selectedUser.name,
         email: selectedUser.email,
-        role: selectedUser.role
-      });
+        role: selectedUser.role,
+        roles: selectedUser.roles?.map(role => role.id) || []
+      };
+      
+      await api.users.update(selectedUser.id, userData);
       setIsEditUserOpen(false);
       toast({
         title: "User updated",
