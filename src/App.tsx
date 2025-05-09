@@ -1,16 +1,12 @@
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Home from './components/home';
 import './App.css';
+import Dashboard from './components/Dashboard';
 
 function App() {
   return (
-    <div className="app-container">
-      <Routes>
-        <Route path="/" element={<Home />} />
-        {/* Add more routes as needed */}
-      </Routes>
+    <div className="min-h-screen bg-gray-50">
+      <Dashboard />
     </div>
   );
 }
