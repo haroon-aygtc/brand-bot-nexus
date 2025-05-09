@@ -27,6 +27,8 @@ import TemplatesPage from "@/pages/TemplatesPage";
 import ResponseFormatterPage from "@/pages/ResponseFormatterPage";
 import { AiConfigRoutes } from "@/components/ai-config";
 import AiConfigPage from "@/pages/AiConfigPage";
+import HomePage from "@/pages/HomePage";
+import ApiTesterPage from "@/pages/ApiTesterPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,9 +53,23 @@ const App = () => (
             <Route path="/sign-up" element={<SignUpPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+            {/* Public Home Page */}
+            <Route path="/" element={
+              <AppLayout>
+                <HomePage />
+              </AppLayout>
+            } />
+
+            {/* Public API Tester */}
+            <Route path="/api-tester" element={
+              <AppLayout>
+                <ApiTesterPage />
+              </AppLayout>
+            } />
             
             {/* Protected Routes */}
-            <Route path="/" element={
+            <Route path="/dashboard" element={
               <ProtectedRoute>
                 <AppLayout>
                   <Dashboard />
