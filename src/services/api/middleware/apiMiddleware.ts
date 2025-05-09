@@ -1,166 +1,162 @@
-
 /**
  * API Middleware
  * 
- * This module provides a standardized way to interact with the backend API.
- * It handles authentication, error handling, and response formatting.
+ * This file provides the core API request functionality with middleware
+ * for authentication, error handling, and logging.
  */
 
-import { ApiResponse } from "@/types/auth";
+import { env, useMockApi } from '@/config/env';
+import logger from '@/utils/logger';
 
-// API base URL - will use relative URL for Vite proxy
-const API_BASE_URL = '/api';
-
-/**
- * Request options for fetch API
- */
-interface RequestOptions {
-  method?: string;
-  headers?: Record<string, string>;
-  body?: any;
-  params?: Record<string, string>;
-  requiresAuth?: boolean;
+// API Response interface
+export interface ApiResponse<T = any> {
+  data: T;
+  status: number;
+  message?: string;
+  error?: boolean;
 }
 
-/**
- * Generic API request function
- */
-async function apiRequest<T>(
-  endpoint: string,
-  options: RequestOptions = {}
-): Promise<ApiResponse<T>> {
-  try {
-    const {
-      method = 'GET',
-      headers = {},
-      body,
-      params,
-      requiresAuth = true,
-    } = options;
+// Default headers for API requests
+const defaultHeaders = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json',
+};
 
-    // Build URL with query parameters
-    let url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
-    
-    if (params) {
-      const queryParams = new URLSearchParams();
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          queryParams.append(key, value);
-        }
-      });
+// API instance that handles requests with middleware
+export const api = {
+  // Generic request method
+  async request<T = any>(
+    endpoint: string,
+    options: RequestInit = {},
+    mockData?: T,
+    requiresAuth: boolean = true
+  ): Promise<ApiResponse<T>> {
+    // Use mock data if mocking is enabled and mock data is provided
+    if (useMockApi && mockData) {
+      logger.info(`[MOCK API] ${options.method || 'GET'} ${endpoint}`, { mockData });
       
-      const queryString = queryParams.toString();
-      if (queryString) {
-        url += `?${queryString}`;
-      }
-    }
-
-    // Build request headers
-    const requestHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest', // Required for Laravel to identify AJAX requests
-      ...headers,
-    };
-
-    // Build request options
-    const fetchOptions: RequestInit = {
-      method,
-      headers: requestHeaders,
-      credentials: 'include', // Include cookies for CSRF protection and Sanctum
-    };
-
-    // Add request body for non-GET methods
-    if (method !== 'GET' && body) {
-      fetchOptions.body = JSON.stringify(body);
-    }
-
-    // Log request details for debugging
-    console.log(`[API] ${method} ${url}`, { 
-      headers: fetchOptions.headers,
-      body: method !== 'GET' && body ? body : undefined 
-    });
-
-    // Make the request
-    const response = await fetch(url, fetchOptions);
-    const contentType = response.headers.get('content-type');
-    
-    let data;
-    // Parse response based on content type
-    if (contentType && contentType.includes('application/json')) {
-      data = await response.json();
-    } else {
-      const text = await response.text();
-      try {
-        // Try to parse as JSON even if content-type is wrong
-        data = JSON.parse(text);
-      } catch (e) {
-        data = { message: text };
-      }
-    }
-
-    // Log response for debugging
-    console.log(`[API] Response from ${url}:`, { 
-      status: response.status, 
-      data 
-    });
-
-    // Handle API error responses
-    if (!response.ok) {
-      // If unauthorized and CSRF token mismatch, try to get a new CSRF token
-      if (response.status === 419) {
-        // CSRF token mismatch, get a new one
-        console.log('[API] CSRF token mismatch, getting a new one');
-        await fetch('/sanctum/csrf-cookie');
-        // Retry the request (recursive call)
-        return apiRequest<T>(endpoint, options);
-      }
-
-      // Format error response
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       return {
-        data: null as unknown as T,
-        success: false,
-        message: data.message || `Error: ${response.statusText}`,
-        errors: data.errors || data.error || null
+        data: mockData,
+        status: 200,
+        message: 'Success (mock data)',
       };
     }
 
-    // Format successful response
-    return {
-      data: data.data || data,
-      success: true,
-      message: data.message || 'Success'
-    };
-  } catch (error) {
-    // Handle network or other errors
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`[API] Error in request to ${endpoint}:`, error);
-    
-    return {
-      data: null as unknown as T,
-      success: false,
-      message: `Network error: ${errorMessage}`
-    };
-  }
-}
-
-// API client with typed methods
-export const api = {
-  get: <T>(endpoint: string, options: Omit<RequestOptions, 'method' | 'body'> = {}) => 
-    apiRequest<T>(endpoint, { ...options, method: 'GET' }),
+    try {
+      // Build request URL
+      const baseUrl = env.API_BASE_URL || '/api';
+      const url = `${baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+      
+      // Add auth headers if required
+      const headers = {
+        ...defaultHeaders,
+        ...options.headers,
+        ...(requiresAuth ? getAuthHeaders() : {}),
+      };
+      
+      // Log the request
+      logger.info(`[API] ${options.method || 'GET'} ${url}`, { 
+        body: options.body, 
+        headers 
+      });
+      
+      // Make the request
+      const response = await fetch(url, {
+        ...options,
+        headers,
+        credentials: 'include', // Include cookies for cross-origin requests
+      });
+      
+      // Try to parse as JSON, fall back to text if not possible
+      let data: any;
+      const contentType = response.headers.get('content-type');
+      
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        data = await response.text();
+        try {
+          data = JSON.parse(data);
+        } catch (e) {
+          // Keep as text if not valid JSON
+        }
+      }
+      
+      // Log the response
+      logger.info(`[API] Response from ${url}:`, { 
+        status: response.status, 
+        data 
+      });
+      
+      // Return formatted response
+      return {
+        data,
+        status: response.status,
+        message: response.statusText,
+        error: !response.ok,
+      };
+    } catch (error) {
+      // Log and rethrow error
+      logger.error(`[API] Error in request to ${endpoint}:`, error);
+      
+      throw error;
+    }
+  },
   
-  post: <T>(endpoint: string, body: any, options: Omit<RequestOptions, 'method'> = {}) => 
-    apiRequest<T>(endpoint, { ...options, method: 'POST', body }),
+  // Convenience methods for different HTTP methods
+  async get<T = any>(endpoint: string, options: RequestInit = {}, mockData?: T, requiresAuth: boolean = true): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, { ...options, method: 'GET' }, mockData, requiresAuth);
+  },
   
-  put: <T>(endpoint: string, body: any, options: Omit<RequestOptions, 'method'> = {}) => 
-    apiRequest<T>(endpoint, { ...options, method: 'PUT', body }),
+  async post<T = any>(endpoint: string, data: any, options: RequestInit = {}, mockData?: T, requiresAuth: boolean = true): Promise<ApiResponse<T>> {
+    return this.request<T>(
+      endpoint, 
+      { 
+        ...options, 
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+      mockData,
+      requiresAuth
+    );
+  },
   
-  patch: <T>(endpoint: string, body: any, options: Omit<RequestOptions, 'method'> = {}) => 
-    apiRequest<T>(endpoint, { ...options, method: 'PATCH', body }),
+  async put<T = any>(endpoint: string, data: any, options: RequestInit = {}, mockData?: T, requiresAuth: boolean = true): Promise<ApiResponse<T>> {
+    return this.request<T>(
+      endpoint,
+      {
+        ...options,
+        method: 'PUT',
+        body: JSON.stringify(data),
+      },
+      mockData,
+      requiresAuth
+    );
+  },
   
-  delete: <T>(endpoint: string, options: Omit<RequestOptions, 'method'> = {}) => 
-    apiRequest<T>(endpoint, { ...options, method: 'DELETE' })
+  async delete<T = any>(endpoint: string, options: RequestInit = {}, mockData?: T, requiresAuth: boolean = true): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, { ...options, method: 'DELETE' }, mockData, requiresAuth);
+  },
+  
+  async patch<T = any>(endpoint: string, data: any, options: RequestInit = {}, mockData?: T, requiresAuth: boolean = true): Promise<ApiResponse<T>> {
+    return this.request<T>(
+      endpoint,
+      {
+        ...options,
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      },
+      mockData,
+      requiresAuth
+    );
+  },
 };
 
-// Export response type
-export type { ApiResponse };
+// Helper function to get auth headers
+function getAuthHeaders() {
+  const token = localStorage.getItem('token');
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+}

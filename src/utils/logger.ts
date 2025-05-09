@@ -1,50 +1,45 @@
+
 /**
- * Simple logger utility for the frontend
+ * Logger utility
+ * 
+ * A simple logging utility that respects environment settings
  */
+
+import { isDev, env } from '@/config/env';
+
+// Debug mode can be enabled via environment variable
+const DEBUG = isDev || env.API_DEBUG;
+
 const logger = {
-  /**
-   * Log info message
-   * @param message Message to log
-   * @param data Optional data to log
-   */
-  info: (message: string, data?: any) => {
-    if (import.meta.env.DEV) {
-      console.info(`[INFO] ${message}`, data || '');
+  info: (...args: any[]) => {
+    if (DEBUG) {
+      console.info('[INFO]', ...args);
     }
   },
-
-  /**
-   * Log warning message
-   * @param message Message to log
-   * @param data Optional data to log
-   */
-  warn: (message: string, data?: any) => {
-    if (import.meta.env.DEV) {
-      console.warn(`[WARN] ${message}`, data || '');
+  
+  warn: (...args: any[]) => {
+    if (DEBUG) {
+      console.warn('[WARN]', ...args);
     }
   },
-
-  /**
-   * Log error message
-   * @param message Message to log
-   * @param error Optional error to log
-   */
-  error: (message: string, error?: any) => {
-    if (import.meta.env.DEV) {
-      console.error(`[ERROR] ${message}`, error || '');
+  
+  error: (...args: any[]) => {
+    // Always log errors, even in production
+    console.error('[ERROR]', ...args);
+  },
+  
+  debug: (...args: any[]) => {
+    if (DEBUG) {
+      console.debug('[DEBUG]', ...args);
     }
   },
-
-  /**
-   * Log debug message
-   * @param message Message to log
-   * @param data Optional data to log
-   */
-  debug: (message: string, data?: any) => {
-    if (import.meta.env.DEV) {
-      console.debug(`[DEBUG] ${message}`, data || '');
+  
+  // A special method for API debug logs
+  api: (...args: any[]) => {
+    if (DEBUG) {
+      console.log('[API]', ...args);
     }
-  },
+  }
 };
 
 export default logger;

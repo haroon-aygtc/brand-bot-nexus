@@ -9,6 +9,7 @@
 interface Env {
   // API configuration
   API_BASE_URL: string;
+  API_DEBUG: boolean;
   
   // Application environment
   NODE_ENV: 'development' | 'production' | 'test';
@@ -30,6 +31,7 @@ export const env: Env = {
   LARAVEL_URL: import.meta.env.VITE_LARAVEL_URL || 'http://localhost:8000',
   APP_NAME: import.meta.env.VITE_APP_NAME || 'ChatEmbed',
   USE_MOCK_API: import.meta.env.VITE_USE_MOCK_API === 'true' || true,
+  API_DEBUG: import.meta.env.VITE_API_DEBUG === 'true' || false,
 };
 
 // Utility to check if we're in development mode
