@@ -1,3 +1,4 @@
+
 /**
  * Authentication API Endpoints
  *
@@ -6,29 +7,20 @@
 
 export const authEndpoints = {
   // Authentication endpoints
-  login: "/api/auth/login",
-  register: "/api/auth/register",
-  logout: "/api/auth/logout",
-  refreshToken: "/api/auth/refresh-token",
-  me: "/api/auth/me",
+  login: "/auth/login",
+  register: "/auth/register",
+  logout: "/auth/logout",
+  me: "/auth/user",
 
-  // Password management
-  forgotPassword: "/api/auth/forgot-password",
-  resetPassword: "/api/auth/reset-password",
-  changePassword: "/api/auth/change-password",
-
-  // Email verification
-  verifyEmail: "/api/auth/verify-email",
-  resendVerification: "/api/auth/resend-verification",
-
-  // Session management
-  sessions: "/api/auth/sessions",
-  revokeSession: (sessionId: string) => `/api/auth/sessions/${sessionId}/revoke`,
-
-  // User profile
-  profile: "/api/auth/profile",
-
-  // Role and permission checks
-  hasRole: (role: string) => `/api/auth/has-role/${role}`,
-  hasPermission: (permission: string) => `/api/auth/has-permission/${permission}`,
+  // These are placeholders for future implementation
+  forgotPassword: "/auth/forgot-password",
+  resetPassword: "/auth/reset-password",
+  changePassword: "/auth/change-password",
+  verifyEmail: "/auth/verify-email",
+  resendVerification: "/auth/resend-verification",
+  sessions: "/auth/sessions",
+  profile: "/auth/profile",
+  revokeSession: (sessionId: string) => `/auth/sessions/${sessionId}/revoke`,
+  hasRole: (role: string) => `/auth/has-role/${role}`,
+  hasPermission: (permission: string) => `/auth/has-permission/${permission}`,
 };

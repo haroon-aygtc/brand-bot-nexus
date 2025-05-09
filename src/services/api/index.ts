@@ -1,3 +1,4 @@
+
 /**
  * API Module Index
  *
@@ -10,20 +11,9 @@ import { api } from "./middleware/apiMiddleware";
 
 // Feature-specific API services
 import { authApi } from "./features/auth";
-import { userApi } from "./features/user";
-import { chatApi } from "./features/chat";
-import { aiApi } from "./features/ai";
-import { knowledgeBaseApi } from "./features/knowledgeBase";
-import { widgetApi } from "./features/widget";
-import { contextRulesApi } from "./features/contextRules";
-import { followUpConfigApi } from "./features/followUpConfig";
-import { followUpQuestionsApi } from "./features/followUpQuestions";
-import { moderationApi } from "./features/moderation";
-import { responseFormattingApi } from "./features/responseFormatting";
-import { scrapingApi } from "./features/scraping";
 
 // API endpoints
-import * as endpoints from "./endpoints";
+import * as endpoints from "./endpoints/authEndpoints";
 
 // Export all API-related services and utilities
 export {
@@ -32,54 +22,12 @@ export {
 
   // Feature-specific API services
   authApi,
-  userApi,
-  chatApi,
-  aiApi,
-  knowledgeBaseApi,
-  widgetApi,
-  contextRulesApi,
-  followUpConfigApi,
-  followUpQuestionsApi,
-  moderationApi,
-  responseFormattingApi,
-  scrapingApi,
 
   // API endpoints
   endpoints,
 };
 
-// Re-export types from feature services
+// Export types from auth
 export type {
-  LoginCredentials,
-  RegisterData,
-  User,
-  AuthResponse,
-} from "./features/auth";
-
-export type {
-  UserProfile,
-  UserActivity,
-  UserQueryParams,
-  UserListResponse,
-} from "./features/user";
-
-export type {
-  ChatSession,
-  ChatMessage,
-  ChatAttachment,
-  SendMessageRequest,
-  CreateSessionRequest,
-} from "./features/chat";
-
-export type {
-  AIModel,
-  GenerateRequest,
-  GenerateResponse,
-  AIInteractionLog,
-  PerformanceMetrics,
-} from "./features/ai";
-
-export type {
-  KnowledgeBaseConfig,
-  KnowledgeBaseQueryRequest,
-} from "./features/knowledgeBase";
+  ApiResponse
+} from "./middleware/apiMiddleware";

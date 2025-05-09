@@ -1,6 +1,8 @@
+
 import { createContext, useContext, useReducer, useEffect } from "react";
 import { User, AuthState } from "@/types/auth";
-import * as authService from "@/services/authService";
+import authService from "@/services/authService";
+import { toast } from "@/components/ui/use-toast";
 
 type AuthAction =
   | { type: "LOGIN_START" }
@@ -20,7 +22,7 @@ const initialState: AuthState = {
   user: null,
   token: localStorage.getItem("token"),
   isAuthenticated: false,
-  isLoading: true, // Start with loading true
+  isLoading: true,
   error: null,
 };
 
@@ -83,7 +85,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const storedUser = localStorage.getItem("user");
 
         if (!token || !storedUser) {
-          // No stored credentials, set not loading and not authenticated
           console.log('No stored credentials found');
           dispatch({ type: "LOGOUT" });
           return;
@@ -91,46 +92,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         try {
           const user = JSON.parse(storedUser) as User;
-
-          // Check if token is expired by trying to get current user
-          try {
-            console.log('Validating stored token...');
-            await authService.getCurrentUser();
-            // If successful, user is authenticated
+          
+          // Validate token by getting current user
+          const currentUser = await authService.getCurrentUser();
+          
+          if (currentUser) {
             console.log('Token is valid, user authenticated');
             dispatch({
               type: "LOGIN_SUCCESS",
-              payload: { user, token },
+              payload: { user: currentUser, token },
             });
-          } catch (error) {
-            console.log('Token may be expired, trying to refresh...');
-            // Try to refresh the token
-            try {
-              const refreshResponse = await authService.refreshToken();
-              // Update with new token and user data
-              localStorage.setItem("token", refreshResponse.token);
-              localStorage.setItem("user", JSON.stringify(refreshResponse.user));
-
-              console.log('Token refreshed successfully');
-              dispatch({
-                type: "LOGIN_SUCCESS",
-                payload: {
-                  user: refreshResponse.user,
-                  token: refreshResponse.token
-                },
-              });
-            } catch (refreshError) {
-              console.error('Failed to refresh token:', refreshError);
-              // Clear storage if refresh fails
-              localStorage.removeItem("token");
-              localStorage.removeItem("user");
-              dispatch({ type: "LOGOUT" });
-            }
+          } else {
+            console.log('Token is invalid, logging out');
+            authService.clearLocalStorage();
+            dispatch({ type: "LOGOUT" });
           }
         } catch (error) {
-          console.error('Error parsing stored user:', error);
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
+          console.error('Error during auth initialization:', error);
+          authService.clearLocalStorage();
           dispatch({ type: "LOGOUT" });
         }
       } catch (error) {
@@ -147,71 +126,87 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       const response = await authService.login({ email, password });
-      console.log('Login API response:', response);
-
-      if (!response || !response.token) {
-        throw new Error('Invalid response from server');
-      }
-
-      localStorage.setItem("token", response.token);
-      localStorage.setItem("user", JSON.stringify(response.user));
-
+      
       dispatch({
         type: "LOGIN_SUCCESS",
         payload: { user: response.user, token: response.token },
       });
-
+      
+      toast({
+        title: "Login Successful",
+        description: `Welcome back, ${response.user.name}`,
+      });
+      
       return true;
     } catch (error) {
-      console.error('Login error details:', error);
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Authentication failed. Please try again.";
+      
       dispatch({
         type: "LOGIN_FAILURE",
-        payload: error instanceof Error ? error.message : "Authentication failed. Please try again.",
+        payload: errorMessage,
       });
+      
+      toast({
+        title: "Login Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      
+      return false;
+    }
+  };
 
+  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+    dispatch({ type: "LOGIN_START" });
+
+    try {
+      const response = await authService.register({ name, email, password });
+      
+      dispatch({
+        type: "LOGIN_SUCCESS",
+        payload: { user: response.user, token: response.token },
+      });
+      
+      toast({
+        title: "Registration Successful",
+        description: `Welcome, ${response.user.name}`,
+      });
+      
+      return true;
+    } catch (error) {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Registration failed. Please try again.";
+      
+      dispatch({
+        type: "LOGIN_FAILURE",
+        payload: errorMessage,
+      });
+      
+      toast({
+        title: "Registration Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      
       return false;
     }
   };
 
   const logout = () => {
-    authService.logout(); // Logout on the server
-    authService.clearLocalStorage(); // Clear local storage
-    dispatch({ type: "LOGOUT" }); // Logout locally
+    authService.logout();
+    dispatch({ type: "LOGOUT" });
+    
+    toast({
+      title: "Logged Out",
+      description: "You have been successfully logged out.",
+    });
   };
 
   const clearError = () => {
     dispatch({ type: "CLEAR_ERROR" });
-  };
-
-  const register = async (name: string, email: string, password: string) => {
-    dispatch({ type: "LOGIN_START" });
-
-    try {
-      const response = await authService.register({ name, email, password });
-      console.log('Register API response:', response);
-
-      if (!response || !response.token) {
-        throw new Error('Invalid response from server');
-      }
-
-      localStorage.setItem("token", response.token);
-      localStorage.setItem("user", JSON.stringify(response.user));
-
-      dispatch({
-        type: "LOGIN_SUCCESS",
-        payload: { user: response.user, token: response.token },
-      });
-
-      return true;
-    } catch (error) {
-      console.error('Registration error details:', error);
-      dispatch({
-        type: "LOGIN_FAILURE",
-        payload: error instanceof Error ? error.message : "Registration failed",
-      });
-
-      return false;
-    }
   };
 
   return (

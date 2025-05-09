@@ -1,17 +1,16 @@
-import { Permission, Role } from './role';
+
+import { Role, Permission } from './mockDb';
 
 export interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
-  email_verified_at?: string;
-  avatar_url?: string;
-  is_active: boolean;
-  last_login_at?: string;
-  created_at: string;
-  updated_at: string;
+  role: 'admin' | 'user' | 'guest';
   roles?: Role[];
   permissions?: Permission[];
+  email_verified_at?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface AuthState {
@@ -31,8 +30,6 @@ export interface RegisterData {
   name: string;
   email: string;
   password: string;
-  password_confirmation?: string;
-  avatar_url?: string;
 }
 
 export interface AuthResponse {
@@ -40,8 +37,12 @@ export interface AuthResponse {
   token: string;
 }
 
-export interface LogoutResponse {
-  message: string;
+// API specific response type
+export interface ApiResponse<T> {
+  data: T;
+  success: boolean;
+  message?: string;
+  errors?: any;
 }
 
 export interface PasswordResetRequest {
@@ -54,14 +55,8 @@ export interface ResetPasswordRequest {
   password_confirmation: string;
 }
 
-export interface UpdateProfileRequest {
-  name?: string;
-  email?: string;
-  avatar_url?: string;
-}
-
 export interface PasswordUpdateData {
-  current_password?: string;
+  current_password: string;
   password: string;
   password_confirmation: string;
 }
@@ -75,8 +70,8 @@ export interface ResendVerificationRequest {
 }
 
 export interface UserSession {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   ip_address?: string;
   user_agent?: string;
   last_active_at: string;
