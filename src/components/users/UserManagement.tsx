@@ -6,7 +6,7 @@ import { UserPlus } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useApi } from '@/hooks/useApi';
 import { api } from '@/lib/api';
-import { User } from '@/types/mockDb';
+import { User, Role } from '@/types/mockDb';
 
 // Import our components
 import UserTable from './user-table/UserTable';
@@ -24,7 +24,7 @@ const UserManagement = () => {
   const [newUser, setNewUser] = useState<UserFormData>({
     name: '',
     email: '',
-    role: 'user' as 'admin' | 'user' | 'guest',
+    role: 'user',
     password: '',
     roles: []
   });
@@ -63,7 +63,11 @@ const UserManagement = () => {
   const handleAddUser = async () => {
     try {
       const userData = {
-        ...newUser,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,  // Ensure this is not optional
+        password: newUser.password,
+        roles: newUser.roles,
         tenantId: undefined,
       };
       
@@ -94,11 +98,16 @@ const UserManagement = () => {
     if (!selectedUser) return;
     
     try {
+      // Convert Role[] to ids for API
+      const roleIds = Array.isArray(selectedUser.roles) 
+        ? selectedUser.roles.map((role: any) => typeof role === 'object' ? role.id : role)
+        : [];
+      
       const userData = {
         name: selectedUser.name,
         email: selectedUser.email,
         role: selectedUser.role,
-        roles: selectedUser.roles?.map(role => role.id) || []
+        roles: roleIds
       };
       
       await api.users.update(selectedUser.id, userData);
