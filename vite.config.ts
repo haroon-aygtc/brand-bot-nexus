@@ -16,6 +16,10 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
+        // Force React to resolve to the same instance
+        'react': path.resolve(__dirname, './node_modules/react'),
+        'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
+        'react/jsx-runtime': path.resolve(__dirname, './node_modules/react/jsx-runtime'),
       },
     },
     server: {
@@ -38,21 +42,36 @@ export default defineConfig(({ mode }) => {
         '@radix-ui/react-slot',
         '@radix-ui/react-compose-refs'
       ],
-      esbuildOptions: {
-        platform: 'browser',
-      },
+      force: true, // Force optimization to resolve dependency issues
     },
     build: {
       commonjsOptions: {
-        include: [],
+        include: [/node_modules/],
+        transformMixedEsModules: true,
       },
       rollupOptions: {
+        onwarn(warning, warn) {
+          // Ignore certain warnings
+          if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+            return
+          }
+          if (warning.code === 'SOURCEMAP_ERROR') {
+            return
+          }
+          // Use default for everything else
+          warn(warning)
+        },
         external: [],
         output: {
-          manualChunks: {
-            'react-vendor': ['react', 'react-dom', 'react/jsx-runtime'],
-            'ui-vendor': Object.keys(require('./package.json').dependencies)
-              .filter(dep => dep.includes('@radix-ui') || dep.includes('next-themes'))
+          manualChunks(id) {
+            // Create separate chunks for React
+            if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+              return 'react-vendor'
+            }
+            // Create separate chunks for Radix UI components
+            if (id.includes('@radix-ui') || id.includes('next-themes')) {
+              return 'ui-vendor'
+            }
           }
         }
       }
