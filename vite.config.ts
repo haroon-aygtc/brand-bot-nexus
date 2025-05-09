@@ -17,6 +17,17 @@ export default defineConfig(({ mode }) => ({
   },
   server: {
     port: 8080,
-    host: "::"
-  }
+    host: "::",
+    proxy: {
+      // Forward API requests to Laravel backend
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+  optimizeDeps: {
+    exclude: ['@rollup/rollup-linux-x64-gnu'],
+  },
 }))
