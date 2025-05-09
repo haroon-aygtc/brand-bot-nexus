@@ -30,7 +30,14 @@ export default defineConfig(({ mode }) => {
       },
     },
     optimizeDeps: {
-      exclude: [],
+      include: [
+        'react', 
+        'react-dom', 
+        'react-router', 
+        'react-router-dom',
+        '@radix-ui/react-slot',
+        '@radix-ui/react-compose-refs'
+      ],
       esbuildOptions: {
         platform: 'browser',
       },
@@ -38,6 +45,16 @@ export default defineConfig(({ mode }) => {
     build: {
       commonjsOptions: {
         include: [],
+      },
+      rollupOptions: {
+        external: [],
+        output: {
+          manualChunks: {
+            'react-vendor': ['react', 'react-dom', 'react/jsx-runtime'],
+            'ui-vendor': Object.keys(require('./package.json').dependencies)
+              .filter(dep => dep.includes('@radix-ui') || dep.includes('next-themes'))
+          }
+        }
       }
     },
   }

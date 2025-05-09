@@ -5,48 +5,38 @@
  * A simple logging utility that respects environment settings
  */
 
-import { isDev, env } from '@/config/env';
+// Debug mode is always enabled in development
+const DEBUG = true;
 
-// Debug mode can be enabled via environment variable
-const DEBUG = isDev || env.API_DEBUG;
-
-// Safe console methods that check if console exists first
-const safeConsole = {
-  info: (...args: any[]) => typeof console !== 'undefined' && console.info(...args),
-  warn: (...args: any[]) => typeof console !== 'undefined' && console.warn(...args),
-  error: (...args: any[]) => typeof console !== 'undefined' && console.error(...args),
-  debug: (...args: any[]) => typeof console !== 'undefined' && console.debug(...args),
-  log: (...args: any[]) => typeof console !== 'undefined' && console.log(...args),
-};
-
+// Logger interface
 const logger = {
   info: (...args: any[]) => {
     if (DEBUG) {
-      safeConsole.info('[INFO]', ...args);
+      console.info('[INFO]', ...args);
     }
   },
   
   warn: (...args: any[]) => {
     if (DEBUG) {
-      safeConsole.warn('[WARN]', ...args);
+      console.warn('[WARN]', ...args);
     }
   },
   
   error: (...args: any[]) => {
-    // Always log errors, even in production
-    safeConsole.error('[ERROR]', ...args);
+    // Always log errors
+    console.error('[ERROR]', ...args);
   },
   
   debug: (...args: any[]) => {
     if (DEBUG) {
-      safeConsole.debug('[DEBUG]', ...args);
+      console.debug('[DEBUG]', ...args);
     }
   },
   
   // A special method for API debug logs
   api: (...args: any[]) => {
     if (DEBUG) {
-      safeConsole.log('[API]', ...args);
+      console.log('[API]', ...args);
     }
   }
 };
