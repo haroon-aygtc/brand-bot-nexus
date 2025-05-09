@@ -1,7 +1,5 @@
 import logger from "@/utils/logger";
-import { api } from "./api/middleware/apiMiddleware";
 import { AIModelRequest, AIModelResponse } from "./ai/types";
-import { aiApi } from "./api";
 
 interface AIInteractionLogsParams {
   page: number;
@@ -32,6 +30,45 @@ interface ModelPerformanceParams {
   endDate?: string;
 }
 
+// Mock data for development without backend
+const mockModels = [
+  { id: "gpt-4", name: "GPT-4", provider: "OpenAI", maxTokens: 8192 },
+  { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo", provider: "OpenAI", maxTokens: 4096 },
+  { id: "claude-3-opus", name: "Claude 3 Opus", provider: "Anthropic", maxTokens: 200000 },
+  { id: "claude-3-sonnet", name: "Claude 3 Sonnet", provider: "Anthropic", maxTokens: 180000 },
+];
+
+const mockInteractionLogs = Array(20).fill(null).map((_, i) => ({
+  id: `log-${i}`,
+  userId: `user-${i % 5}`,
+  query: `Sample question ${i}?`,
+  response: `Sample response for question ${i}.`,
+  modelUsed: i % 2 === 0 ? "gpt-4" : "claude-3-opus",
+  timestamp: new Date(Date.now() - i * 3600000).toISOString(),
+  contextRuleId: i % 3 === 0 ? `rule-${i % 5}` : null,
+  knowledgeBaseResults: i,
+}));
+
+const mockPerformanceData = {
+  modelUsage: [
+    { name: "GPT-4", value: 42 },
+    { name: "GPT-3.5 Turbo", value: 78 },
+    { name: "Claude 3 Opus", value: 35 },
+    { name: "Claude 3 Sonnet", value: 28 },
+  ],
+  avgResponseTimes: [
+    { name: "GPT-4", value: 2.3 },
+    { name: "GPT-3.5 Turbo", value: 1.1 },
+    { name: "Claude 3 Opus", value: 3.5 },
+    { name: "Claude 3 Sonnet", value: 2.8 },
+  ],
+  dailyUsage: Array(7).fill(null).map((_, i) => ({
+    date: new Date(Date.now() - i * 86400000).toISOString().split('T')[0],
+    total: Math.floor(Math.random() * 50) + 10,
+  })),
+  timeRange: "7d",
+};
+
 const aiService = {
   /**
    * Generate a response using AI models
@@ -40,69 +77,28 @@ const aiService = {
     options: GenerateResponseOptions,
   ): Promise<AIModelResponse> => {
     try {
-      // Convert options to AIModelRequest format
-      const modelRequest: AIModelRequest = {
-        query: options.query,
-        contextRuleId: options.contextRuleId,
-        userId: options.userId,
-        knowledgeBaseIds: options.knowledgeBaseIds,
-        promptTemplate: options.promptTemplate,
-        systemPrompt: options.systemPrompt,
-        preferredModel: options.preferredModel,
-        maxTokens: options.maxTokens,
-        temperature: options.temperature,
-        additionalParams: options.additionalParams,
+      // In development without backend, return mock response
+      logger.info("Generating mock AI response", options);
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      return {
+        content: `This is a mock response to your query: "${options.query}". When the backend is connected, you'll receive actual AI-generated responses.`,
+        modelUsed: options.preferredModel || "mock-model",
+        knowledgeBaseResults: 3,
+        knowledgeBaseIds: options.knowledgeBaseIds || [],
+        metadata: { mock: true, timestamp: new Date().toISOString() }
       };
-
-      // Use the aiApi to generate a response
-      const response = await aiApi.generate(modelRequest);
-
-      if (!response.success || !response.data) {
-        throw new Error(
-          response.error?.message || "Failed to generate AI response",
-        );
-      }
-
-      // Log the interaction using the API instead of direct database access
-      await aiApi.logInteraction({
-        userId: options.userId,
-        query: options.query,
-        response: response.data.content,
-        modelUsed: response.data.modelUsed,
-        contextRuleId: options.contextRuleId,
-        knowledgeBaseResults: response.data.knowledgeBaseResults || 0,
-        knowledgeBaseIds: response.data.knowledgeBaseIds || [],
-        metadata: response.data.metadata,
-      });
-
-      return response.data;
     } catch (error) {
       logger.error("Error generating AI response:", error);
 
       // Return a fallback response
-      const fallbackResponse = {
+      return {
         content:
           "I'm sorry, I encountered an error processing your request. Please try again later.",
         modelUsed: "fallback-model",
       };
-
-      // Try to log the error using the API instead of direct database access
-      try {
-        await aiApi.logInteraction({
-          userId: options.userId,
-          query: options.query,
-          response: fallbackResponse.content,
-          modelUsed: fallbackResponse.modelUsed,
-          contextRuleId: options.contextRuleId,
-          metadata: {
-            error: error instanceof Error ? error.message : String(error),
-          },
-        });
-      } catch (logError) {
-        logger.error("Failed to log AI interaction error:", logError);
-      }
-
-      return fallbackResponse;
     }
   },
 
@@ -120,13 +116,7 @@ const aiService = {
     metadata?: Record<string, any>;
   }) => {
     try {
-      const response = await aiApi.logInteraction(data);
-
-      if (!response.success) {
-        logger.error("Error logging AI interaction:", response.error);
-        return false;
-      }
-
+      logger.info("Logging AI interaction (mock)", data);
       return true;
     } catch (error) {
       logger.error("Error logging AI interaction:", error);
@@ -139,22 +129,41 @@ const aiService = {
    */
   getInteractionLogs: async (params: AIInteractionLogsParams) => {
     try {
-      const response = await aiApi.getLogs(params);
-
-      if (!response.success) {
-        throw new Error(
-          response.error?.message || "Failed to fetch AI interaction logs",
+      logger.info("Getting AI interaction logs (mock)", params);
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Filter mock logs based on params
+      let filteredLogs = [...mockInteractionLogs];
+      
+      if (params.query) {
+        const query = params.query.toLowerCase();
+        filteredLogs = filteredLogs.filter(log => 
+          log.query.toLowerCase().includes(query) || 
+          log.response.toLowerCase().includes(query)
         );
       }
-
-      return (
-        response.data || {
-          logs: [],
-          totalItems: 0,
-          totalPages: 0,
-          currentPage: params.page,
-        }
-      );
+      
+      if (params.modelUsed) {
+        filteredLogs = filteredLogs.filter(log => log.modelUsed === params.modelUsed);
+      }
+      
+      if (params.contextRuleId) {
+        filteredLogs = filteredLogs.filter(log => log.contextRuleId === params.contextRuleId);
+      }
+      
+      const totalItems = filteredLogs.length;
+      const totalPages = Math.ceil(totalItems / params.pageSize);
+      const startIndex = (params.page - 1) * params.pageSize;
+      const paginatedLogs = filteredLogs.slice(startIndex, startIndex + params.pageSize);
+      
+      return {
+        logs: paginatedLogs,
+        totalItems,
+        totalPages,
+        currentPage: params.page,
+      };
     } catch (error) {
       logger.error("Error getting AI interaction logs:", error);
       return {
@@ -171,15 +180,12 @@ const aiService = {
    */
   getAvailableModels: async () => {
     try {
-      const response = await aiApi.getModels();
-
-      if (!response.success) {
-        throw new Error(
-          response.error?.message || "Failed to fetch available AI models",
-        );
-      }
-
-      return response.data || [];
+      logger.info("Getting available AI models (mock)");
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      return mockModels;
     } catch (error) {
       logger.error("Error getting available AI models:", error);
       return [];
@@ -191,14 +197,7 @@ const aiService = {
    */
   setDefaultModel: async (modelId: string) => {
     try {
-      const response = await aiApi.setDefaultModel(modelId);
-
-      if (!response.success) {
-        throw new Error(
-          response.error?.message || "Failed to set default AI model",
-        );
-      }
-
+      logger.info("Setting default AI model (mock)", modelId);
       return true;
     } catch (error) {
       logger.error("Error setting default AI model:", error);
@@ -211,15 +210,8 @@ const aiService = {
    */
   getDefaultModel: async () => {
     try {
-      const response = await aiApi.getDefaultModel();
-
-      if (!response.success) {
-        throw new Error(
-          response.error?.message || "Failed to get default AI model",
-        );
-      }
-
-      return response.data || null;
+      logger.info("Getting default AI model (mock)");
+      return mockModels[0];
     } catch (error) {
       logger.error("Error getting default AI model:", error);
       return null;
@@ -231,23 +223,12 @@ const aiService = {
    */
   getModelPerformance: async (params: ModelPerformanceParams = {}) => {
     try {
-      const response = await aiApi.getPerformance(params.timeRange);
-
-      if (!response.success) {
-        throw new Error(
-          response.error?.message ||
-            "Failed to fetch AI model performance metrics",
-        );
-      }
-
-      return (
-        response.data || {
-          modelUsage: [],
-          avgResponseTimes: [],
-          dailyUsage: [],
-          timeRange: params.timeRange || "7d",
-        }
-      );
+      logger.info("Getting AI model performance metrics (mock)", params);
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 600));
+      
+      return mockPerformanceData;
     } catch (error) {
       logger.error("Error getting AI model performance metrics:", error);
       return {

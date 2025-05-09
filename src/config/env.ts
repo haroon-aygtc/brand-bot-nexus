@@ -1,3 +1,4 @@
+
 /**
  * Environment configuration
  * 
@@ -17,6 +18,9 @@ interface Env {
   
   // Other environment variables
   APP_NAME: string;
+  
+  // Mock API configuration
+  USE_MOCK_API: boolean;
 }
 
 // Get environment variables from import.meta.env (Vite)
@@ -25,6 +29,7 @@ export const env: Env = {
   NODE_ENV: (import.meta.env.MODE || 'development') as 'development' | 'production' | 'test',
   LARAVEL_URL: import.meta.env.VITE_LARAVEL_URL || 'http://localhost:8000',
   APP_NAME: import.meta.env.VITE_APP_NAME || 'ChatEmbed',
+  USE_MOCK_API: import.meta.env.VITE_USE_MOCK_API === 'true' || true,
 };
 
 // Utility to check if we're in development mode
@@ -35,6 +40,9 @@ export const isProd = env.NODE_ENV === 'production';
 
 // Utility to check if we're in test mode
 export const isTest = env.NODE_ENV === 'test';
+
+// Utility to check if we should use mock API
+export const useMockApi = env.USE_MOCK_API || isDev;
 
 // Utility to get the full API URL for a specific endpoint
 export const getApiUrl = (endpoint: string) => {

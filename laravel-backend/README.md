@@ -51,3 +51,29 @@ npm run full
 ```
 
 This will start both the Laravel backend and Vite development server for the frontend.
+
+## Frontend Development Without Backend
+
+During initial development, you can run the frontend independently without the backend. The frontend includes mock data services that simulate backend responses for development purposes.
+
+To run the frontend only:
+
+```
+# From the project root directory
+npm run dev
+```
+
+Once your backend is ready, the frontend will automatically connect to it through the configured proxy.
+
+## Troubleshooting
+
+If you encounter issues with Rollup dependencies, try the following:
+
+1. Clear your node_modules and package-lock.json:
+   ```
+   rm -rf node_modules package-lock.json
+   npm install
+   ```
+
+2. If using Vite in a Docker environment, ensure the proper platform-specific dependencies are excluded in vite.config.ts.
+
