@@ -1,76 +1,80 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  MultiSelect, 
-  MultiSelectContent, 
-  MultiSelectItem, 
-  MultiSelectTrigger, 
-  MultiSelectValue 
-} from '@/components/ui/multi-select';
-import { useGetRoles } from '@/hooks/useApi';
+import { Label } from '@/components/ui/label';
 
 export interface UserFormData {
   name: string;
   email: string;
-  role?: 'admin' | 'user' | 'guest';
+  role: 'admin' | 'user' | 'guest';
   password?: string;
-  roles?: string[];
+  roles: string[];
 }
 
 interface UserFormProps {
   data: UserFormData;
   onChange: (data: UserFormData) => void;
-  isNewUser?: boolean;
 }
 
-const UserForm: React.FC<UserFormProps> = ({ data, onChange, isNewUser = false }) => {
-  const { data: roles, isLoading: rolesLoading, execute: fetchRoles } = useGetRoles();
+const UserForm: React.FC<UserFormProps> = ({ data, onChange }) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    onChange({ ...data, [name]: value });
+  };
   
-  useEffect(() => {
-    fetchRoles();
-  }, []);
+  const handleRoleChange = (value: 'admin' | 'user' | 'guest') => {
+    onChange({ ...data, role: value });
+  };
   
   return (
-    <div className="space-y-4 py-2">
-      <div className="space-y-2">
-        <Label htmlFor="name">Full Name</Label>
+    <div className="space-y-4">
+      <div className="grid w-full items-center gap-1.5">
+        <Label htmlFor="name">Name</Label>
         <Input
+          type="text"
           id="name"
+          name="name"
           value={data.name}
-          onChange={(e) => onChange({ ...data, name: e.target.value })}
+          onChange={handleInputChange}
+          placeholder="Enter user name"
         />
       </div>
-      <div className="space-y-2">
+      
+      <div className="grid w-full items-center gap-1.5">
         <Label htmlFor="email">Email</Label>
         <Input
-          id="email"
           type="email"
+          id="email"
+          name="email"
           value={data.email}
-          onChange={(e) => onChange({ ...data, email: e.target.value })}
+          onChange={handleInputChange}
+          placeholder="Enter user email"
         />
       </div>
-      {isNewUser && (
-        <div className="space-y-2">
+      
+      {data.password !== undefined && (
+        <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="password">Password</Label>
           <Input
-            id="password"
             type="password"
-            value={data.password || ''}
-            onChange={(e) => onChange({ ...data, password: e.target.value })}
+            id="password"
+            name="password"
+            value={data.password}
+            onChange={handleInputChange}
+            placeholder="Enter password"
           />
         </div>
       )}
-      <div className="space-y-2">
-        <Label htmlFor="role">Legacy Role</Label>
-        <Select
-          value={data.role}
-          onValueChange={(value) => onChange({ ...data, role: value as 'admin' | 'user' | 'guest' })}
+      
+      <div className="grid w-full items-center gap-1.5">
+        <Label htmlFor="role">Role</Label>
+        <Select 
+          value={data.role} 
+          onValueChange={(value: string) => handleRoleChange(value as 'admin' | 'user' | 'guest')}
         >
           <SelectTrigger id="role">
-            <SelectValue placeholder="Select role" />
+            <SelectValue placeholder="Select a role" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="admin">Admin</SelectItem>
@@ -78,35 +82,6 @@ const UserForm: React.FC<UserFormProps> = ({ data, onChange, isNewUser = false }
             <SelectItem value="guest">Guest</SelectItem>
           </SelectContent>
         </Select>
-        <p className="text-xs text-muted-foreground mt-1">
-          Legacy role for backward compatibility. Consider using the roles selection below.
-        </p>
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="roles">Roles</Label>
-        {rolesLoading ? (
-          <div className="text-sm text-muted-foreground">Loading roles...</div>
-        ) : roles && roles.length > 0 ? (
-          <MultiSelect
-            value={data.roles || []}
-            onValueChange={(value) => onChange({ ...data, roles: value })}
-            placeholder="Select roles"
-          >
-            <MultiSelectTrigger id="roles" className="w-full">
-              <MultiSelectValue placeholder="Select roles" />
-            </MultiSelectTrigger>
-            <MultiSelectContent>
-              {roles.map((role) => (
-                <MultiSelectItem key={role.id} value={role.id}>
-                  {role.name}
-                </MultiSelectItem>
-              ))}
-            </MultiSelectContent>
-          </MultiSelect>
-        ) : (
-          <div className="text-sm text-muted-foreground">No roles available</div>
-        )}
       </div>
     </div>
   );

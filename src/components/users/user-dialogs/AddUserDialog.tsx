@@ -29,7 +29,6 @@ const AddUserDialog: React.FC<AddUserDialogProps> = ({
         <UserForm 
           data={userData} 
           onChange={onUserDataChange} 
-          isNewUser={true}
         />
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -37,7 +36,7 @@ const AddUserDialog: React.FC<AddUserDialogProps> = ({
           </Button>
           <Button onClick={onAddUser}>
             <Check className="mr-2 h-4 w-4" />
-            Create User
+            Add User
           </Button>
         </DialogFooter>
       </DialogContent>

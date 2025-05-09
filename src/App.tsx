@@ -1,3 +1,4 @@
+
 import { Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
@@ -16,7 +17,11 @@ function App() {
             <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
               <div className="app-container">
                 <Routes>
-                  {/* Your existing routes */}
+                  {/* Public routes rendered directly without admin sidebar */}
+                  <Route path="/" element={<div>Home Page</div>} />
+                  <Route path="/api-tester" element={<AppRoutes />} />
+                  
+                  {/* Admin routes with sidebar */}
                   <Route path="/*" element={<AppRoutes />} />
                 </Routes>
               </div>
