@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     host: "::",
     proxy: {
-      // Forward API requests to Laravel backend
+      // Forward API requests to Laravel backend when it's available
       '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,
@@ -28,6 +28,21 @@ export default defineConfig(({ mode }) => ({
     },
   },
   optimizeDeps: {
-    exclude: ['@rollup/rollup-linux-x64-gnu'],
+    exclude: [
+      '@rollup/rollup-linux-x64-gnu',
+      '@rollup/rollup-darwin-x64',
+      '@rollup/rollup-darwin-arm64',
+      '@rollup/rollup-win32-x64-msvc',
+    ],
   },
+  build: {
+    rollupOptions: {
+      external: [
+        '@rollup/rollup-linux-x64-gnu',
+        '@rollup/rollup-darwin-x64',
+        '@rollup/rollup-darwin-arm64',
+        '@rollup/rollup-win32-x64-msvc',
+      ]
+    }
+  }
 }))
