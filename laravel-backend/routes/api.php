@@ -7,6 +7,26 @@ use Illuminate\Support\Facades\Route;
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/register', [AuthController::class, 'register']);
 
+// API documentation endpoints
+Route::get('/api-docs', function() {
+    // Return a list of all available API endpoints with their descriptions
+    return response()->json([
+        'status' => 'success',
+        'message' => 'API Documentation',
+        'data' => [
+            'version' => '1.0',
+            'base_url' => url('/api'),
+            'endpoints' => [
+                'auth' => [
+                    'login' => ['POST', '/auth/login', 'Authenticate user and get token'],
+                    'register' => ['POST', '/auth/register', 'Register a new user'],
+                ],
+                // Additional endpoint documentation
+            ]
+        ]
+    ]);
+});
+
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     // Auth routes

@@ -1,159 +1,134 @@
 
-import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 import {
-  LayoutDashboard,
-  Settings,
+  Home,
   MessageSquare,
   Database,
   Code,
-  BarChart2,
+  Settings,
   Users,
-  FileText,
   Globe,
-  LogOut,
-  ChevronLeft,
-  Menu,
-  Sliders,
+  Terminal,
+  BookOpen,
+  Bot,
+  BarChart,
+  Layout,
+  FileText,
+  Server
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-
-type NavItem = {
-  title: string;
-  icon: React.ElementType;
-  path: string;
-  badge?: number;
-  requiredRole?: 'admin' | 'user' | 'guest';
-};
-
-const mainNavItems: NavItem[] = [
-  { title: 'Dashboard', icon: LayoutDashboard, path: '/' },
-  { title: 'Widget Config', icon: Sliders, path: '/widget-config' },
-  { title: 'Context Rules', icon: MessageSquare, path: '/context-rules' },
-  { title: 'Templates', icon: FileText, path: '/templates' },
-  { title: 'Embed Code', icon: Code, path: '/embed-code' },
-  { title: 'Analytics', icon: BarChart2, path: '/analytics' },
-  { title: 'Response Formatter', icon: FileText, path: '/response-formatter' },
-  { title: 'AI Models', icon: Database, path: '/ai-models' },
-  { title: 'AI Configuration', icon: Settings, path: '/ai-config' },
-  { title: 'Web Scraping', icon: Globe, path: '/scraper' },
-  { title: 'User Management', icon: Users, path: '/users', requiredRole: 'admin' },
-];
+import { useState, useEffect } from 'react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
-  const { logout, user } = useAuth();
+  const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+  // Handle window resize for responsive behavior
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (mobile) setCollapsed(true);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const navigationItems = [
+    { name: 'Home', path: '/', icon: Home },
+    { name: 'API Tester', path: '/api-tester', icon: Terminal },
+    { name: 'Dashboard', path: '/dashboard', icon: BarChart },
+    { name: 'Chat', path: '/chats', icon: MessageSquare },
+    { name: 'AI Models', path: '/ai-models', icon: Bot },
+    { name: 'Knowledge', path: '/knowledge', icon: Database },
+    { name: 'Widget Config', path: '/widget-config', icon: Layout },
+    { name: 'Scraper', path: '/scraper', icon: Globe },
+    { name: 'Context Rules', path: '/context-rules', icon: FileText },
+    { name: 'Templates', path: '/templates', icon: BookOpen },
+    { name: 'Embed Code', path: '/embed-code', icon: Code },
+    { name: 'Response Formatter', path: '/response-formatter', icon: Server },
+    { name: 'Users', path: '/users', icon: Users },
+    { name: 'Settings', path: '/settings', icon: Settings },
+  ];
+
+  const toggleSidebar = () => {
+    setCollapsed(!collapsed);
   };
 
-  // Filter menu items based on user role
-  const filteredNavItems = mainNavItems.filter(item => {
-    if (!item.requiredRole) return true;
-    return user?.role === item.requiredRole;
-  });
-
   return (
-    <div
-      className={cn(
-        'flex flex-col h-screen bg-[#1f2937] border-r border-[#2e3846] transition-all duration-300',
-        collapsed ? 'w-[70px]' : 'w-[250px]'
-      )}
-    >
-      <div className="flex items-center justify-between p-4 border-b border-[#2e3846]">
+    <div className={cn(
+      "border-r border-gray-200 bg-white transition-all duration-300 flex flex-col",
+      collapsed ? "w-16" : "w-64"
+    )}>
+      {/* Sidebar header */}
+      <div className="p-4 border-b border-gray-200 flex justify-between items-center">
         {!collapsed && (
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-md bg-brand-blue flex items-center justify-center text-white font-bold">
-              <MessageSquare size={16} />
-            </div>
-            <h1 className="font-bold text-lg text-white">ChatAdmin</h1>
-          </div>
-        )}
-        {collapsed && (
-          <div className="w-full flex justify-center">
-            <div className="w-7 h-7 rounded-md bg-brand-blue flex items-center justify-center text-white font-bold">
-              <MessageSquare size={16} />
-            </div>
-          </div>
+          <h1 className="text-lg font-semibold text-gray-800">Brand Bot</h1>
         )}
         <button
-          onClick={() => setCollapsed(!collapsed)}
-          className={cn('h-8 w-8 rounded-md text-gray-400 hover:bg-[#2e3846] hover:text-white transition-colors', 
-            collapsed && 'mx-auto')}
+          onClick={toggleSidebar}
+          className={cn(
+            "p-1 rounded hover:bg-gray-100",
+            collapsed ? "mx-auto" : ""
+          )}
         >
-          {collapsed ? <Menu size={18} /> : <ChevronLeft size={18} />}
+          {collapsed ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.707 9.293a1 1 0 00-1.414 1.414L9.586 12l-1.293 1.293a1 1 0 101.414 1.414L11 13.414l1.293 1.293a1 1 0 001.414-1.414L12.414 12l1.293-1.293a1 1 0 00-1.414-1.414L11 10.586 9.707 9.293z" clipRule="evenodd" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
+          )}
         </button>
       </div>
 
-      <div className="flex-shrink-0 px-3 py-4 border-b border-[#2e3846]">
-        {!collapsed ? (
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-brand-blue flex items-center justify-center overflow-hidden">
-              <img
-                src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff"
-                alt="Admin User"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="overflow-hidden">
-              <h3 className="text-sm font-medium text-white truncate">{user?.name || 'Admin User'}</h3>
-              <p className="text-xs text-gray-400 truncate">{user?.email || 'admin@example.com'}</p>
-            </div>
-          </div>
-        ) : (
-          <div className="flex justify-center">
-            <div className="w-10 h-10 rounded-full bg-brand-blue flex items-center justify-center overflow-hidden">
-              <img
-                src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff"
-                alt="Admin User"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        )}
-      </div>
-
-      <nav className="flex-1 overflow-y-auto py-4 custom-scrollbar">
-        <ul className="space-y-1 px-3">
-          {filteredNavItems.map((item) => (
-            <li key={item.title}>
+      {/* Navigation items */}
+      <ScrollArea className="flex-1">
+        <nav className="p-2">
+          {navigationItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
               <Link
+                key={item.path}
                 to={item.path}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors',
-                  location.pathname === item.path
-                    ? 'bg-[#2e3846] text-white'
-                    : 'text-gray-400 hover:bg-[#2e3846] hover:text-white'
+                  "flex items-center px-2 py-2 my-1 rounded-md text-sm font-medium transition-colors",
+                  collapsed ? "justify-center" : "",
+                  isActive
+                    ? "bg-blue-100 text-blue-800"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                 )}
               >
-                <item.icon size={18} />
-                {!collapsed && <span>{item.title}</span>}
-                {!collapsed && item.badge && (
-                  <span className="ml-auto bg-brand-blue text-white text-xs rounded-full min-w-5 h-5 flex items-center justify-center px-1">
-                    {item.badge}
-                  </span>
-                )}
+                <item.icon className={cn("h-5 w-5", !collapsed && "mr-3")} />
+                {!collapsed && <span>{item.name}</span>}
               </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
+            );
+          })}
+        </nav>
+      </ScrollArea>
 
-      <div className="p-3 mt-auto border-t border-[#2e3846]">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-3 py-2 text-sm rounded-md text-gray-400 hover:bg-[#2e3846] hover:text-white transition-colors"
-        >
-          <LogOut size={18} />
-          {!collapsed && <span>Logout</span>}
-        </button>
+      {/* Sidebar footer */}
+      <div className="p-4 border-t border-gray-200">
+        <div className={cn(
+          "flex items-center",
+          collapsed ? "justify-center" : ""
+        )}>
+          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-semibold">
+            {/* User initial */}
+            A
+          </div>
+          {!collapsed && (
+            <div className="ml-3">
+              <p className="text-sm font-medium text-gray-800">Admin User</p>
+              <p className="text-xs text-gray-500">admin@example.com</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
