@@ -7,7 +7,7 @@ import { componentTagger } from "lovable-tagger"
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
-  
+
   return {
     plugins: [
       react(),
@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
       host: "::",
       proxy: {
         '/api': {
-          target: 'http://localhost:8000',
+          target: 'http://laravel-backend.test',
           changeOrigin: true,
           secure: false,
         },
@@ -35,9 +35,9 @@ export default defineConfig(({ mode }) => {
     },
     optimizeDeps: {
       include: [
-        'react', 
-        'react-dom', 
-        'react-router', 
+        'react',
+        'react-dom',
+        'react-router',
         'react-router-dom',
         '@radix-ui/react-slot',
         '@radix-ui/react-compose-refs'

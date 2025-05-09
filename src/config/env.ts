@@ -1,6 +1,6 @@
 /**
  * Environment configuration
- * 
+ *
  * This module provides typed access to environment variables.
  */
 
@@ -9,22 +9,32 @@ interface Env {
   // API configuration
   API_BASE_URL: string;
   API_DEBUG: boolean;
-  
+
   // Application environment
   NODE_ENV: 'development' | 'production' | 'test';
-  
+
   // Laravel backend configuration
   LARAVEL_URL: string;
-  
+
   // Other environment variables
   APP_NAME: string;
-  
+
   // Mock API configuration
   USE_MOCK_API: boolean;
 }
 
+// Define the shape of Vite's environment variables
+interface ImportMetaEnv {
+  VITE_API_URL?: string;
+  VITE_LARAVEL_URL?: string;
+  VITE_APP_NAME?: string;
+  VITE_USE_MOCK_API?: string;
+  VITE_API_DEBUG?: string;
+  MODE?: string;
+}
+
 // Safely access environment variables with fallbacks
-const getEnv = () => {
+const getEnv = (): ImportMetaEnv => {
   try {
     return typeof import.meta !== 'undefined' ? import.meta.env : {};
   } catch (e) {
@@ -33,13 +43,13 @@ const getEnv = () => {
   }
 };
 
-const safeEnv = getEnv();
+const safeEnv: ImportMetaEnv = getEnv();
 
 // Get environment variables with fallbacks
 export const env: Env = {
   API_BASE_URL: safeEnv.VITE_API_URL || '/api',
   NODE_ENV: (safeEnv.MODE || 'development') as 'development' | 'production' | 'test',
-  LARAVEL_URL: safeEnv.VITE_LARAVEL_URL || 'http://localhost:8000',
+  LARAVEL_URL: safeEnv.VITE_LARAVEL_URL || 'http://laravel-backend.test',
   APP_NAME: safeEnv.VITE_APP_NAME || 'ChatEmbed',
   USE_MOCK_API: safeEnv.VITE_USE_MOCK_API === 'true' || false, // Default to using real API
   API_DEBUG: safeEnv.VITE_API_DEBUG === 'true' || false,
