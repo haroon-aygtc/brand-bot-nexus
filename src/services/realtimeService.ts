@@ -65,4 +65,8 @@ class RealtimeService {
   }
 }
 
+// Export an instance of the service
 export const realtimeService = new RealtimeService();
+
+// Also export as default for compatibility with existing imports
+export default realtimeService;

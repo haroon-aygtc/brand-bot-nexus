@@ -1,3 +1,4 @@
+
 /**
  * Environment configuration
  * 
@@ -32,3 +33,9 @@ export const isProd = env.NODE_ENV === 'production';
 // Utility to check if we're in test mode
 export const isTest = env.NODE_ENV === 'test';
 
+// Utility to get the full API URL for a specific endpoint
+export const getApiUrl = (endpoint: string) => {
+  const baseUrl = env.API_BASE_URL;
+  const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  return `${baseUrl}${path}`;
+};
