@@ -24,14 +24,17 @@ interface Env {
   USE_MOCK_API: boolean;
 }
 
-// Get environment variables from import.meta.env (Vite)
+// Safely access import.meta.env with fallbacks
+const safeEnv = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : {};
+
+// Get environment variables from import.meta.env (Vite) with fallbacks
 export const env: Env = {
-  API_BASE_URL: import.meta.env.VITE_API_URL || '/api',
-  NODE_ENV: (import.meta.env.MODE || 'development') as 'development' | 'production' | 'test',
-  LARAVEL_URL: import.meta.env.VITE_LARAVEL_URL || 'http://localhost:8000',
-  APP_NAME: import.meta.env.VITE_APP_NAME || 'ChatEmbed',
-  USE_MOCK_API: import.meta.env.VITE_USE_MOCK_API === 'true' || true,
-  API_DEBUG: import.meta.env.VITE_API_DEBUG === 'true' || false,
+  API_BASE_URL: safeEnv.VITE_API_URL || '/api',
+  NODE_ENV: (safeEnv.MODE || 'development') as 'development' | 'production' | 'test',
+  LARAVEL_URL: safeEnv.VITE_LARAVEL_URL || 'http://localhost:8000',
+  APP_NAME: safeEnv.VITE_APP_NAME || 'ChatEmbed',
+  USE_MOCK_API: safeEnv.VITE_USE_MOCK_API === 'true' || true,
+  API_DEBUG: safeEnv.VITE_API_DEBUG === 'true' || false,
 };
 
 // Utility to check if we're in development mode

@@ -28,21 +28,15 @@ export default defineConfig(({ mode }) => ({
     },
   },
   optimizeDeps: {
-    exclude: [
-      '@rollup/rollup-linux-x64-gnu',
-      '@rollup/rollup-darwin-x64',
-      '@rollup/rollup-darwin-arm64',
-      '@rollup/rollup-win32-x64-msvc',
-    ],
+    exclude: ['@rollup/rollup-linux-x64-gnu', '@rollup/rollup-darwin-x64', '@rollup/rollup-darwin-arm64', '@rollup/rollup-win32-x64-msvc'],
   },
   build: {
     rollupOptions: {
-      external: [
-        '@rollup/rollup-linux-x64-gnu',
-        '@rollup/rollup-darwin-x64',
-        '@rollup/rollup-darwin-arm64',
-        '@rollup/rollup-win32-x64-msvc',
-      ]
+      external: ['@rollup/rollup-linux-x64-gnu', '@rollup/rollup-darwin-x64', '@rollup/rollup-darwin-arm64', '@rollup/rollup-win32-x64-msvc']
     }
+  },
+  // Prevent Rollup from trying to bundle platform-specific dependencies
+  ssr: {
+    noExternal: true,
   }
 }))
