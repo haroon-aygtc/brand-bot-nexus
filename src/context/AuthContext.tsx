@@ -6,7 +6,7 @@ import { toast } from "@/components/ui/use-toast";
 
 type AuthAction =
   | { type: "LOGIN_START" }
-  | { type: "LOGIN_SUCCESS"; payload: { user: User; token: string } }
+  | { type: "LOGIN_SUCCESS"; payload: { user: User } }
   | { type: "LOGIN_FAILURE"; payload: string }
   | { type: "LOGOUT" }
   | { type: "CLEAR_ERROR" };
@@ -20,7 +20,6 @@ interface AuthContextType extends AuthState {
 
 const initialState: AuthState = {
   user: null,
-  token: localStorage.getItem("token"),
   isAuthenticated: false,
   isLoading: true,
   error: null,
@@ -40,7 +39,6 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       return {
         ...state,
         user: action.payload.user,
-        token: action.payload.token,
         isAuthenticated: true,
         isLoading: false,
         error: null,
@@ -49,7 +47,6 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       return {
         ...state,
         user: null,
-        token: null,
         isAuthenticated: false,
         isLoading: false,
         error: action.payload,
@@ -58,7 +55,6 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       return {
         ...state,
         user: null,
-        token: null,
         isAuthenticated: false,
         isLoading: false,
         error: null,
@@ -81,35 +77,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const storedUser = localStorage.getItem("user");
-
-        if (!token || !storedUser) {
-          console.log('No stored credentials found');
-          dispatch({ type: "LOGOUT" });
-          return;
-        }
-
-        try {
-          const user = JSON.parse(storedUser) as User;
-          
-          // Validate token by getting current user
-          const currentUser = await authService.getCurrentUser();
-          
-          if (currentUser) {
-            console.log('Token is valid, user authenticated');
-            dispatch({
-              type: "LOGIN_SUCCESS",
-              payload: { user: currentUser, token },
-            });
-          } else {
-            console.log('Token is invalid, logging out');
-            authService.clearLocalStorage();
-            dispatch({ type: "LOGOUT" });
-          }
-        } catch (error) {
-          console.error('Error during auth initialization:', error);
-          authService.clearLocalStorage();
+        const user = await authService.getCurrentUser();
+        
+        if (user) {
+          console.log('User authenticated', user);
+          dispatch({
+            type: "LOGIN_SUCCESS",
+            payload: { user },
+          });
+        } else {
+          console.log('No authenticated user found');
           dispatch({ type: "LOGOUT" });
         }
       } catch (error) {
@@ -129,7 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       
       dispatch({
         type: "LOGIN_SUCCESS",
-        payload: { user: response.user, token: response.token },
+        payload: { user: response.user },
       });
       
       toast({
@@ -166,7 +143,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       
       dispatch({
         type: "LOGIN_SUCCESS",
-        payload: { user: response.user, token: response.token },
+        payload: { user: response.user },
       });
       
       toast({

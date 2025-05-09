@@ -6,7 +6,7 @@
  */
 
 import { User, LoginCredentials, RegisterData } from "@/types/auth";
-import { authApi } from "./api/features/auth";
+import { authApi, getAuthUser, removeAuthUser } from "./api/features/auth";
 
 /**
  * Authentication service for user management
@@ -53,10 +53,19 @@ const authService = {
    */
   getCurrentUser: async (): Promise<User | null> => {
     try {
+      // First check localStorage for cached user
+      const cachedUser = getAuthUser();
+      
+      // If we have a cached user, verify with the server
       const response = await authApi.getCurrentUser();
       
       if (!response.success) {
         return null;
+      }
+      
+      // Update cached user if different
+      if (cachedUser?.id !== response.data.id) {
+        authApi.setAuthUser(response.data);
       }
       
       return response.data;
@@ -83,16 +92,19 @@ const authService = {
    * Clear localStorage
    */
   clearLocalStorage: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    removeAuthUser();
   },
 
   /**
-   * Refresh token - not implemented in the backend yet
+   * Check if user is authenticated
    */
-  refreshToken: async () => {
-    console.warn('Token refresh not implemented in the backend.');
-    throw new Error('Token refresh not implemented');
+  isAuthenticated: async (): Promise<boolean> => {
+    try {
+      const user = await authService.getCurrentUser();
+      return !!user;
+    } catch (error) {
+      return false;
+    }
   }
 };
 

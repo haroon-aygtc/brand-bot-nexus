@@ -6,6 +6,7 @@
  */
 
 import { api } from "../middleware/apiMiddleware";
+import { authEndpoints } from "../endpoints/authEndpoints";
 import { 
   User, 
   LoginCredentials, 
@@ -14,35 +15,43 @@ import {
   ApiResponse 
 } from "@/types/auth";
 
-// Auth endpoints
-export const authEndpoints = {
-  login: "/auth/login",
-  register: "/auth/register",
-  me: "/auth/user",
-  logout: "/auth/logout"
+// Set user in localStorage
+export const setAuthUser = (user: User): void => {
+  localStorage.setItem('user', JSON.stringify(user));
 };
 
-// Set auth token in localStorage
-export const setAuthToken = (token: string): void => {
-  localStorage.setItem('token', token);
-};
-
-// Remove auth token from localStorage
-export const removeAuthToken = (): void => {
-  localStorage.removeItem('token');
+// Remove user from localStorage
+export const removeAuthUser = (): void => {
   localStorage.removeItem('user');
+};
+
+// Get user from localStorage
+export const getAuthUser = (): User | null => {
+  const user = localStorage.getItem('user');
+  return user ? JSON.parse(user) : null;
 };
 
 export const authApi = {
   /**
+   * Get CSRF cookie for Sanctum
+   */
+  getCsrfCookie: async (): Promise<void> => {
+    await fetch('/sanctum/csrf-cookie', {
+      credentials: 'include'
+    });
+  },
+
+  /**
    * Login with email and password
    */
   login: async (credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> => {
+    // Get CSRF cookie first (Sanctum requirement)
+    await authApi.getCsrfCookie();
+    
     const response = await api.post<AuthResponse>(authEndpoints.login, credentials);
     
     if (response.success && response.data) {
-      setAuthToken(response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      setAuthUser(response.data.user);
     }
     
     return response;
@@ -52,11 +61,13 @@ export const authApi = {
    * Register a new user
    */
   register: async (data: RegisterData): Promise<ApiResponse<AuthResponse>> => {
+    // Get CSRF cookie first (Sanctum requirement)
+    await authApi.getCsrfCookie();
+    
     const response = await api.post<AuthResponse>(authEndpoints.register, data);
     
     if (response.success && response.data) {
-      setAuthToken(response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      setAuthUser(response.data.user);
     }
     
     return response;
@@ -74,7 +85,7 @@ export const authApi = {
    */
   logout: async (): Promise<ApiResponse<void>> => {
     const response = await api.post<void>(authEndpoints.logout, {});
-    removeAuthToken();
+    removeAuthUser();
     return response;
   }
 };

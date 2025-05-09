@@ -11,16 +11,6 @@ import { ApiResponse } from "@/types/auth";
 // API base URL - will use relative URL for Vite proxy
 const API_BASE_URL = '/api';
 
-// Token storage key name
-const TOKEN_KEY = 'token';
-
-/**
- * Get stored authentication token
- */
-const getToken = (): string | null => {
-  return localStorage.getItem(TOKEN_KEY);
-};
-
 /**
  * Request options for fetch API
  */
@@ -69,22 +59,15 @@ async function apiRequest<T>(
     const requestHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest', // Required for Laravel to identify AJAX requests
       ...headers,
     };
-
-    // Add authorization header if required
-    if (requiresAuth) {
-      const token = getToken();
-      if (token) {
-        requestHeaders['Authorization'] = `Bearer ${token}`;
-      }
-    }
 
     // Build request options
     const fetchOptions: RequestInit = {
       method,
       headers: requestHeaders,
-      credentials: 'include', // Include cookies for CSRF protection
+      credentials: 'include', // Include cookies for CSRF protection and Sanctum
     };
 
     // Add request body for non-GET methods
@@ -124,6 +107,15 @@ async function apiRequest<T>(
 
     // Handle API error responses
     if (!response.ok) {
+      // If unauthorized and CSRF token mismatch, try to get a new CSRF token
+      if (response.status === 419) {
+        // CSRF token mismatch, get a new one
+        console.log('[API] CSRF token mismatch, getting a new one');
+        await fetch('/sanctum/csrf-cookie');
+        // Retry the request (recursive call)
+        return apiRequest<T>(endpoint, options);
+      }
+
       // Format error response
       return {
         data: null as unknown as T,
