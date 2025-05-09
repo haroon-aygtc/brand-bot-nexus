@@ -24,16 +24,25 @@ interface Env {
   USE_MOCK_API: boolean;
 }
 
-// Safely access import.meta.env with fallbacks
-const safeEnv = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : {};
+// Safely access environment variables with fallbacks
+const getEnv = () => {
+  try {
+    return typeof import.meta !== 'undefined' ? import.meta.env : {};
+  } catch (e) {
+    console.warn('Unable to access import.meta.env, using fallbacks');
+    return {};
+  }
+};
 
-// Get environment variables from import.meta.env (Vite) with fallbacks
+const safeEnv = getEnv();
+
+// Get environment variables with fallbacks
 export const env: Env = {
   API_BASE_URL: safeEnv.VITE_API_URL || '/api',
   NODE_ENV: (safeEnv.MODE || 'development') as 'development' | 'production' | 'test',
   LARAVEL_URL: safeEnv.VITE_LARAVEL_URL || 'http://localhost:8000',
   APP_NAME: safeEnv.VITE_APP_NAME || 'ChatEmbed',
-  USE_MOCK_API: safeEnv.VITE_USE_MOCK_API === 'true' || true,
+  USE_MOCK_API: safeEnv.VITE_USE_MOCK_API === 'true' || false, // Default to using real API
   API_DEBUG: safeEnv.VITE_API_DEBUG === 'true' || false,
 };
 
@@ -47,7 +56,7 @@ export const isProd = env.NODE_ENV === 'production';
 export const isTest = env.NODE_ENV === 'test';
 
 // Utility to check if we should use mock API
-export const useMockApi = env.USE_MOCK_API || isDev;
+export const useMockApi = env.USE_MOCK_API;
 
 // Utility to get the full API URL for a specific endpoint
 export const getApiUrl = (endpoint: string) => {

@@ -1,3 +1,4 @@
+
 /**
  * API Middleware
  * 
@@ -36,7 +37,7 @@ export const api = {
       logger.info(`[MOCK API] ${options.method || 'GET'} ${endpoint}`, { mockData });
       
       // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       return {
         data: mockData,
