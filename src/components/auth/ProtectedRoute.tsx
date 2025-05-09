@@ -1,36 +1,46 @@
-
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: 'admin' | 'user' | 'guest';
 }
 
-const ProtectedRoute = ({ children, requiredRole = 'user' }: ProtectedRouteProps) => {
-  const { isAuthenticated, isLoading, hasPermission } = useAuth();
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  if (isLoading) {
+  // Use effect to handle the auth check with a slight delay
+  // This prevents flickering between login and protected content
+  useEffect(() => {
+    if (!isLoading) {
+      // Small timeout to ensure all auth state is properly updated
+      const timer = setTimeout(() => {
+        setIsCheckingAuth(false);
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
+
+  // Show loading state while checking auth
+  if (isLoading || isCheckingAuth) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <p className="ml-3 text-lg text-gray-700">Checking authentication...</p>
       </div>
     );
   }
 
-  if (!isAuthenticated) {
-    // Redirect to the login page with a return url
-    return <Navigate to="/sign-in" state={{ from: location }} replace />;
+  // Redirect to login if not authenticated
+  if (!isAuthenticated || !user) {
+    console.log('Not authenticated, redirecting to login');
+    return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
-  // Check if user has the required role using the hasPermission function
-  if (!hasPermission(requiredRole)) {
-    // Redirect to the home page if user doesn't have the required permission
-    return <Navigate to="/" replace />;
-  }
-
+  // User is authenticated, render children
   return <>{children}</>;
 };
 

@@ -1,62 +1,195 @@
-
-import { Bell, Search, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "../ui/button";
+import { Menu, X, MessageSquare, LogOut } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { useAuth } from "@/context/AuthContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
+} from "../ui/dropdown-menu";
 
-const Header = () => {
+interface HeaderProps {}
+
+const Header = ({}: HeaderProps) => {
+  const { user, isAuthenticated, logout } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
-    <header className="flex items-center justify-between p-4 border-b border-[#e5e7eb] bg-white">
-      <h1 className="text-xl font-semibold text-[#1f2937]">Admin Dashboard</h1>
-      
-      <div className="flex items-center space-x-4">
-        <div className="relative w-64">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search..."
-            className="w-full bg-background pl-8 rounded-md"
-          />
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-20 items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2">
+          <MessageSquare className="h-8 w-8 text-primary" />
+          <span className="text-xl font-bold">ChatEmbed</span>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-6">
+          <Link
+            to="/"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            Home
+          </Link>
+          <Link
+            to="/features"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            Features
+          </Link>
+          <Link
+            to="/pricing"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            Pricing
+          </Link>
+          <Link
+            to="/docs"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            Documentation
+          </Link>
+        </nav>
+
+        {/* Auth Buttons - Desktop */}
+        <div className="hidden md:flex items-center gap-4">
+          <ThemeToggle />
+          {isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="gap-2">
+                  <span>{user?.name || 'User'}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to="/admin/dashboard">Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/account">Account Settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <button type="button" onClick={() => { logout(); navigate('/'); }}>Logout</button>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Button variant="ghost" asChild>
+                <Link to="/auth/login">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/auth/register">Sign Up</Link>
+              </Button>
+            </>
+          )}
         </div>
-        
-        <Button variant="outline" size="icon" className="relative">
-          <Bell size={18} />
-          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-[10px] text-white flex items-center justify-center">
-            3
-          </span>
-        </Button>
-        
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 outline-none">
-              <div className="w-8 h-8 rounded-full bg-brand-blue flex items-center justify-center overflow-hidden">
-                <img
-                  src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff"
-                  alt="Admin User"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <span className="text-sm font-medium">Admin User</span>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Billing</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Log out</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+
+        {/* Mobile Menu Button */}
+        <button
+          type="button"
+          className="md:hidden p-2 rounded-md hover:bg-accent"
+          onClick={toggleMobileMenu}
+          aria-label="Toggle menu"
+        >
+          {isMobileMenuOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Menu className="h-6 w-6" />
+          )}
+        </button>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden py-4 px-6 border-t border-border/40 bg-background">
+          <nav className="flex flex-col space-y-4">
+            <Link
+              to="/"
+              className="text-sm font-medium hover:text-primary transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link
+              to="/features"
+              className="text-sm font-medium hover:text-primary transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Features
+            </Link>
+            <Link
+              to="/pricing"
+              className="text-sm font-medium hover:text-primary transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Pricing
+            </Link>
+            <Link
+              to="/docs"
+              className="text-sm font-medium hover:text-primary transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Documentation
+            </Link>
+
+            <div className="pt-4 border-t border-border/40">
+              {isAuthenticated ? (
+                <div className="flex flex-col space-y-3">
+                  <Link
+                    to="/admin/dashboard"
+                    className="text-sm font-medium hover:text-primary transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/account"
+                    className="text-sm font-medium hover:text-primary transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Account Settings
+                  </Link>
+                  <Link
+                    to="#"
+                    className="text-sm font-medium hover:text-primary transition-colors"
+                    onClick={() => { setIsMobileMenuOpen(false); logout(); navigate('/'); }}
+                  >
+                    Logout
+                  </Link>
+                </div>
+              ) : (
+                <div className="flex flex-col space-y-3">
+                  <Button variant="ghost" className="justify-start" asChild>
+                    <Link
+                      to="/auth/login"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Login
+                    </Link>
+                  </Button>
+                  <Button className="w-full" asChild>
+                    <Link
+                      to="/auth/register"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Sign Up
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };
