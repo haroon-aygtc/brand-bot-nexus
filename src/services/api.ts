@@ -1,7 +1,11 @@
+
 /**
  * API Service
  * Centralized service for making API requests
  */
+
+// Re-export API modules from the new structure
+export * from './api/index';
 
 // When using Vite proxy, we can use relative URLs
 // This will be automatically proxied to the backend

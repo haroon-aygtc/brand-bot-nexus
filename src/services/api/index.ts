@@ -11,9 +11,10 @@ import { api } from "./middleware/apiMiddleware";
 
 // Feature-specific API services
 import { authApi } from "./features/auth";
+import { aiApi } from "./features/ai";
 
 // API endpoints
-import * as endpoints from "./endpoints/authEndpoints";
+import * as endpoints from "./endpoints";
 
 // Export all API-related services and utilities
 export {
@@ -22,12 +23,13 @@ export {
 
   // Feature-specific API services
   authApi,
+  aiApi,
 
   // API endpoints
   endpoints,
 };
 
-// Export types from auth
+// Export types from middleware
 export type {
   ApiResponse
 } from "./middleware/apiMiddleware";
