@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -56,12 +57,8 @@ const App = () => (
             {/* Public Home Page - Rendered directly without AppLayout */}
             <Route path="/" element={<HomePage />} />
 
-            {/* Public API Tester - Rendered with AppLayout because it's in the admin section */}
-            <Route path="/api-tester" element={
-              <AppLayout>
-                <ApiTesterPage />
-              </AppLayout>
-            } />
+            {/* Public API Tester - Rendered directly without AppLayout */}
+            <Route path="/api-tester" element={<ApiTesterPage />} />
             
             {/* Protected Routes */}
             <Route path="/dashboard" element={
